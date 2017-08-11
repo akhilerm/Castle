@@ -24,10 +24,10 @@
                 if ($args[0] == ".."){
                     $_SESSION['PWD'] = '~';
                 }
-                elseif ($args[0] != "." && $args[0] != undefined){
+                else if ($args[0] != "."){
                     $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
                     if ($_SESSION['PWD']!='~') {
-                        $dir = $dir.$_SESSION['PWD'].'/';
+                        $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
                     }
                     $files = preg_grep('/^([^.])/', scandir($dir));
                     $folder = "NIL";
@@ -36,19 +36,22 @@
                             $folder = $file;
                         }
                     }
-                    if ($folder != $args[0]) {
-                        $result[] = "[[;".$this->COMMAND_COLOR.";]cd]: ".$args[0].": Not a directory";
-                        return $result;
+                    if ($folder!="NIL" && $folder ==$args[0]) {
+                        $_SESSION['PWD']="~/".$folder;
                     }
                     else{
-                        $_SESSION['PWD']="~/".$folder;
-                        $result[]='';
+                        $result[0] = "\n[[;".$this->COMMAND_COLOR.";]cd]: ".$args[0].": Not a directory\n";
+                        $result[1] = "false";
                         return $result;
                     }
+
                 }
+
+                $result[0]=$_SESSION['USER_NAME'].'@Castle:'.$_SESSION['PWD'].'/$';
+                $result[1]="true";
+                return $result;
             }
-            $result[]='';
-            return $result;
+
 
 		}
 
@@ -81,7 +84,7 @@
 			if ($this->check("ls", $args)) {
 			    $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
                 if ($_SESSION['PWD']!='~') {
-                    $dir = $dir.$_SESSION['PWD'].'/';
+                    $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
                 }
                 $files = preg_grep('/^([^.])/', scandir($dir));
                 $result[]="\n";

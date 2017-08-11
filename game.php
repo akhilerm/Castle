@@ -19,6 +19,13 @@
             $.jrpc("shell.php",cmd.name,[cmd.args],
                 function(data){   // process data.result depending on the command and return value
                     term.resume();
+                    if (cmd.name == "cd"){
+                        if (data.result[1] == "true")
+                            term.set_prompt(data.result[0]);
+                        else
+                            term.echo(data.result[0]);
+                    }
+                    else
                     term.echo(data.result);
                 },
                 function(xhr, status, error) {
@@ -39,6 +46,7 @@
         name: 'js',
         height: 200,
         prompt: '<?php echo $_SESSION['USER_NAME']?>@Castle:<?php echo $_SESSION['PWD']?>/$ '
+
     });
 });
 </script>
