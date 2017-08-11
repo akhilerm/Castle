@@ -37,5 +37,13 @@
             return;
         }
     }
+    else {
+        if (isset($_SESSION['SHADOW'])) {
+            header("location:shadow.php");
+        }
+        else if (isset($_SESSION['GAMER'])) {
+            header("location:gamer.php");
+        }
+    }
 
 ?>

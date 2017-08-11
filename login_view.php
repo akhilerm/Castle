@@ -13,12 +13,13 @@
                 unset($_SESSION['MESSAGE']);
             }
 ?>
+            <br>
             <form method="post" action="login.php">
                 <input name="username" id="username"/>
                 <label for="username">Username</label>
                 <input name="password" id="password"/>
                 <label for="password">Password</label>
-                <button type="submit" name="btn_login">Login</button>
+                <button name="btn_login">Login</button>
             </form>
 <?php
         }
