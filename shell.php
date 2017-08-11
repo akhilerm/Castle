@@ -40,14 +40,14 @@
                         $_SESSION['PWD']="~/".$folder;
                     }
                     else{
-                        $result[0] = "\n[[;".$this->COMMAND_COLOR.";]cd]: ".$args[0].": Not a directory\n";
+                        $result[0] = "\ncd: ".$args[0].": Not a directory\n";
                         $result[1] = "false";
                         return $result;
                     }
 
                 }
 
-                $result[0]=$_SESSION['USER_NAME'].'@Castle:'.$_SESSION['PWD'].'/$';
+                $result[0]=$_SESSION['USER_NAME'].'@Castle:'.$_SESSION['PWD'].'/$ ';
                 $result[1]="true";
                 return $result;
             }
@@ -56,11 +56,25 @@
 		}
 
 		public function cat($args) {
-
+            if ($this->check("cat", $args)) {
+                $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+                if ($_SESSION['PWD']!='~') {
+                    $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
+                }
+                $files = preg_grep('/^([^.])/', scandir($dir));
+                foreach ($files as $file) {
+                    if (is_file($dir.$file) && $file == $args[0]) {
+                        $result[] = file_get_contents($dir.$file);
+                        return $result;
+                    }
+                }
+                $result[] = "cat: ".$args[0].": No such file";
+                return $result;
+            }
 		}
 
 		public function edit($args) {
-
+            
 		}
 
 		public function help($args) {

@@ -25,8 +25,9 @@
                         else
                             term.echo(data.result[0]);
                     }
-                    else
-                    term.echo(data.result);
+                    else {
+                        term.echo(data.result);
+                    }
                 },
                 function(xhr, status, error) {
                    term.error('[AJAX] ' + status +' - Server reponse is: \n' + xhr.responseText);
