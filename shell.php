@@ -2,19 +2,53 @@
 	require ("json-rpc.php");
 	include ("config.php");
 	require_once ("db_connect.php");
+	require_once ("sessions.php");
+
+	session_create();
 
 	class Shell_Commands {
 
 		private $COMMAND_COLOR;
 		private $DIR_COLOR;
+		private $WORK_DIR;
 
 		public function __construct() {
-			global $COMMAND_COLOR, $DIR_COLOR;
+			global $COMMAND_COLOR, $DIR_COLOR, $WORK_DIR;
 			$this->COMMAND_COLOR = $COMMAND_COLOR;
 			$this->DIR_COLOR = $DIR_COLOR;
+			$this->WORK_DIR = $WORK_DIR;
 		}
 
 		public function cd($args) {
+            if ($this->check("cd", $args)) {
+                if ($args[0] == ".."){
+                    $_SESSION['PWD'] = '~';
+                }
+                elseif ($args[0] != "." && $args[0] != undefined){
+                    $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+                    if ($_SESSION['PWD']!='~') {
+                        $dir = $dir.$_SESSION['PWD'].'/';
+                    }
+                    $files = preg_grep('/^([^.])/', scandir($dir));
+                    $folder = "NIL";
+                    foreach ($files as $file) {
+                        if (is_dir($dir.$file)) {
+                            $folder = $file;
+                        }
+                    }
+                    if ($folder != $args[0]) {
+                        $result[] = "[[;".$this->COMMAND_COLOR.";]cd]: ".$args[0].": Not a directory";
+                        return $result;
+                    }
+                    else{
+                        $_SESSION['PWD']="~/".$folder;
+                        $result[]='';
+                        return $result;
+                    }
+                }
+            }
+            $result[]='';
+            return $result;
 
 		}
 
@@ -26,8 +60,8 @@
 
 		}
 
-		public function help($token) {
-			if ($this->check("help", $token)) {
+		public function help($args) {
+			if ($this->check("help", $args)) {
 				$result[]="\nUse the following shell commands:
 [[;".$this->COMMAND_COLOR.";]cd]     - change directory [dir_name]
 [[;".$this->COMMAND_COLOR.";]cat]    - print file [file_name]
@@ -43,37 +77,55 @@
 			return $result;
 		}
 
-		public function ls($token) {
-			$list[]=$this->COMMAND_COLOR;
-			return $list;
+		public function ls($args) {
+			if ($this->check("ls", $args)) {
+			    $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+                if ($_SESSION['PWD']!='~') {
+                    $dir = $dir.$_SESSION['PWD'].'/';
+                }
+                $files = preg_grep('/^([^.])/', scandir($dir));
+                $result[]="\n";
+                foreach ($files as $file) {
+                    if (is_dir($dir.$file)) {
+                        $result[0] = $result[0]."[[;".$this->DIR_COLOR.";]".$file."/]\n";
+                    }
+                    else
+                        $result[0] = $result[0].$file."\n";
+                }
+            }
+			return $result;
 		}
 
-		public function logout($token) {
-            if ($this->check("logout", $token)) {
+		public function logout($args) {
+            if ($this->check("logout", $args)) {
                 session_create();
                 if (session_check()) {
                     sess_destroy();
                     header("location:index.php");
+                    return;
                 }
                 else{
                     header("location:index.php");
+                    return;
                 }
             }
+            $result[] = "Logging out...";
+            return $result;
 		}
 
-		public function request($token) {
+		public function request($args) {
 			
 		}
 
-		public function status($token) {
+		public function status($args) {
 			
 		}
 
-		public function submit($token) {
+		public function submit($args) {
 			
 		}
 
-		public function verify($token) {
+		public function verify($args) {
 			
 		}
 

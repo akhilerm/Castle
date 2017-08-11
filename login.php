@@ -7,21 +7,22 @@
  */
     require_once ("sessions.php");
     require_once ("db_connect.php");
+
     session_create();
     if (!session_check()) {
-        $username = cleanup($POST['username'], $con);
-        $password = cleanup($POST['password'], $con);
+        $username = cleanup($_POST['username'], $con);
+        $password = cleanup($_POST['password'], $con);
         if ($username!='' && $password!='') {
             $password = sha1($password);
             $result = $con->query("select id from users where username='$username' and password='$password'");
-            if (!$result) {
+            if ($result) {
                 if ($result->num_rows>0) {
                     $row = $result->fetch_assoc();
                     $_SESSION['USER_ID'] = $row['id'];
                     $_SESSION['USER_NAME'] = $username;
                     $_SESSION['PWD'] = '~';
-                    session_set_user();// fetch if user is admin and set admin session in such a case
-                    header("location:gamer.php");
+                    session_set_gamer();// fetch if user is admin and set shadow session in such a case
+                    header("location:game.php");
                     return;
                 }
             }

@@ -1,3 +1,7 @@
+<?php
+    require_once ('sessions.php');
+    session_create();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +17,7 @@
         
             this.pause();
             $.jrpc("shell.php",cmd.name,[cmd.args],
-                function(data){
+                function(data){   // process data.result depending on the command and return value
                     term.resume();
                     term.echo(data.result);
                 },
@@ -28,13 +32,13 @@
         }*/
     }, {
         tabcompletion: true,
-        completion: function(command, callback) {
+        completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
             callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
         },
-        greetings: 'Mounting /home/user...',
+        greetings: 'Mounting /home/<?php echo $_SESSION['USER_NAME']; ?>...',
         name: 'js',
         height: 200,
-        prompt: 'user@Castle:~/$ '
+        prompt: '<?php echo $_SESSION['USER_NAME']?>@Castle:<?php echo $_SESSION['PWD']?>/$ '
     });
 });
 </script>
