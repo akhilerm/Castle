@@ -11,12 +11,14 @@
 		private $COMMAND_COLOR;
 		private $DIR_COLOR;
 		private $WORK_DIR;
+		private $con;
 
 		public function __construct() {
-			global $COMMAND_COLOR, $DIR_COLOR, $WORK_DIR;
+			global $COMMAND_COLOR, $DIR_COLOR, $WORK_DIR, $con;
 			$this->COMMAND_COLOR = $COMMAND_COLOR;
 			$this->DIR_COLOR = $DIR_COLOR;
 			$this->WORK_DIR = $WORK_DIR;
+			$this->con = $con;
 		}
 
 		public function cd($args) {
@@ -25,7 +27,7 @@
                     $_SESSION['PWD'] = '~';
                 }
                 else if ($args[0] != "."){
-                    $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+                    $dir = $this->WORK_DIR.'/users/'.$_SESSION['USER_ID'].'/';
                     if ($_SESSION['PWD']!='~') {
                         $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
                     }
@@ -57,7 +59,7 @@
 
 		public function cat($args) {
             if ($this->check("cat", $args)) {
-                $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+                $dir = $this->WORK_DIR.'/users/'.$_SESSION['USER_ID'].'/';
                 if ($_SESSION['PWD']!='~') {
                     $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
                 }
@@ -74,7 +76,7 @@
 		}
 
 		public function edit($args) {
-            
+            //inbuilt editor needed
 		}
 
 		public function help($args) {
@@ -90,13 +92,13 @@
 [[;".$this->COMMAND_COLOR.";]status] - print progress
 [[;".$this->COMMAND_COLOR.";]submit] - submit final solution for assessment [file_name]
 [[;".$this->COMMAND_COLOR.";]verify] - runs tests on solution file [file_name]\n";
+			    return $result;
 			}
-			return $result;
 		}
 
 		public function ls($args) {
 			if ($this->check("ls", $args)) {
-			    $dir = $this->WORK_DIR.'/'.$_SESSION['USER_ID'].'/';
+			    $dir = $this->WORK_DIR.'/users/'.$_SESSION['USER_ID'].'/';
                 if ($_SESSION['PWD']!='~') {
                     $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
                 }
@@ -131,7 +133,66 @@
 		}
 
 		public function request($args) {
-			
+			if ($this->check("request", $args)) {
+                $dir = $this->WORK_DIR.'/users/'.$_SESSION['USER_ID'].'/';
+                if ($_SESSION['PWD']!='~') {
+                    $dir = $dir.explode("/", $_SESSION['PWD'])[1].'/';
+                }
+                $files = preg_grep('/^([^.])/', scandir($dir));
+                $folder = "NIL";
+                foreach ($files as $file) {
+                    if (is_dir($dir.$file)) {
+                        $folder = $file;
+                    }
+                }
+                if ($folder!="NIL") {
+                    $result[] = "You can request a new challenge only after completing the current challenge";
+                    return $result;
+                }
+                else {
+                    $rows = $this->con->query("select level, sublevel from users where id='".$_SESSION['USER_ID']."'");
+                    $row = $rows->fetch_assoc();
+                    $level = $row['level'];
+                    $sublevel = $row['sublevel'];
+                    ///To check whether player has completed the game
+                    $rows=$this->con->query("select level_no, sublevel_no from levels order by level_no desc, sublevel_no desc");
+                    $row = $rows->fetch_assoc();
+                    $max_level = $row['level_no'];
+                    $max_sublevel = $row['sublevel_no'];
+                    //to find maximum sublevel of current level
+                    if ($level == $max_level) {
+                        $cur_max_sublevel = $max_sublevel;
+                    }
+                    else{
+                        while($row=$rows->fetch_assoc()) {
+                            if ($level == $row['level_no']){
+                                $cur_max_sublevel = $row['sublevel_no'];
+                                break;
+                            }
+                        }
+                    }
+                    //checking whether game over
+                    if ($level == $max_level && $sublevel == $max_sublevel) {
+                        $result[] = "Congratulations. You did it";
+                        return $result;
+                    }
+                    else if ($sublevel == $max_sublevel) {
+                        $sublevel = 1;
+                        $level = $level+1;
+                    }
+                    else{
+                        $sublevel = $sublevel+1;
+                    }
+                    //here, add code to start new countdown
+                    $this->con->query("update users set level=".$level.", sublevel=".$sublevel." where id=".$_SESSION['USER_ID']);
+                    $rows=$this->con->query("select name from levels where level_no=".$level." and sublevel_no=".$sublevel);
+                    $question = array();
+                    while($row=$rows->fetch_assoc()) {
+                        $question[]=$row['name'];
+                    }
+
+                }
+            }
 		}
 
 		public function status($args) {
