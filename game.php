@@ -25,6 +25,12 @@
                         else
                             term.echo(data.result[0]);
                     }
+                    else if (cmd.name == "request") {
+                        term.echo("\nRequesting challenge...\n");
+                        setTimeout(function () {
+                            term.echo(data.result);
+                        }, 400);
+                    }
                     else {
                         term.echo(data.result);
                     }

@@ -146,14 +146,14 @@
                     }
                 }
                 if ($folder!="NIL") {
-                    $result[] = "You can request a new challenge only after completing the current challenge";
+                    $result[] = "You can request a new challenge only after completing the current challenge\n";
                     return $result;
                 }
                 else {
-                    $rows = $this->con->query("select level, sublevel from users where id='".$_SESSION['USER_ID']."'");
+                    $rows = $this->con->query("select level_no, sublevel_no from levels,users where levels.id=level_id and users.id=".$_SESSION['USER_ID']);
                     $row = $rows->fetch_assoc();
-                    $level = $row['level'];
-                    $sublevel = $row['sublevel'];
+                    $level = $row['level_no'];
+                    $sublevel = $row['sublevel_no'];
                     ///To check whether player has completed the game
                     $rows=$this->con->query("select level_no, sublevel_no from levels order by level_no desc, sublevel_no desc");
                     $row = $rows->fetch_assoc();
@@ -173,7 +173,7 @@
                     }
                     //checking whether game over
                     if ($level == $max_level && $sublevel == $max_sublevel) {
-                        $result[] = "Congratulations. You did it";
+                        $result[] = "No more challenges. You did it";
                         return $result;
                     }
                     else if ($sublevel == $max_sublevel) {
@@ -182,15 +182,20 @@
                     }
                     else{
                         $sublevel = $sublevel+1;
+                        if($level == 0) {
+                            $level++;
+                        }
                     }
                     //here, add code to start new countdown
-                    $this->con->query("update users set level=".$level.", sublevel=".$sublevel." where id=".$_SESSION['USER_ID']);
-                    $rows=$this->con->query("select name from levels where level_no=".$level." and sublevel_no=".$sublevel);
-                    $question = array();
-                    while($row=$rows->fetch_assoc()) {
-                        $question[]=$row['name'];
-                    }
-
+                    $rows=$this->con->query("select id, name from levels where level_no=".$level." and sublevel_no=".$sublevel." order by rand() limit 1");
+                    $row=$rows->fetch_assoc();
+                    $qs_name=$row['name'];
+                    $qs_id=$row['id'];
+                    $output=shell_exec("cp -r ".$this->WORK_DIR."levels/".$qs_name." ".$this->WORK_DIR."users/".$_SESSION['USER_ID']."/".$qs_name);
+                    $this->con->query("update users set level_id=".$qs_id." where id=".$_SESSION['USER_ID']);
+                    //$result[]="New challenge [[;".$this->DIR_COLOR.";]".$qs_name."]/ added\n";
+                    $result[]=is_writable($this->WORK_DIR."users");
+                    return $result;
                 }
             }
 		}
