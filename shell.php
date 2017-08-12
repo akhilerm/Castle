@@ -150,6 +150,7 @@
                     return $result;
                 }
                 else {
+                    //redundant code ahead. use a function
                     $rows = $this->con->query("select level_no, sublevel_no from levels,users where levels.id=level_id and users.id=".$_SESSION['USER_ID']);
                     $row = $rows->fetch_assoc();
                     $level = $row['level_no'];
@@ -171,6 +172,7 @@
                             }
                         }
                     }
+                    //redundant code ^
                     //checking whether game over
                     if ($level == $max_level && $sublevel == $max_sublevel) {
                         $result[] = "No more challenges. You did it";
@@ -201,7 +203,56 @@
 		}
 
 		public function status($args) {
-			
+			if ($this->check("status", $args)) {
+                //redundant code ahead. use a function instead
+                $rows = $this->con->query("select level_no, sublevel_no from levels,users where levels.id=level_id and users.id=".$_SESSION['USER_ID']);
+                $row = $rows->fetch_assoc();
+                $level = $row['level_no'];
+                $sublevel = $row['sublevel_no'];
+                ///To check whether player has completed the game
+                $rows=$this->con->query("select level_no, sublevel_no from levels order by level_no desc, sublevel_no desc");
+                $row = $rows->fetch_assoc();
+                $max_level = $row['level_no'];
+                $max_sublevel = $row['sublevel_no'];
+                //to find maximum sublevel of current level
+                if ($level == $max_level) {
+                    $cur_max_sublevel = $max_sublevel;
+                }
+                else{
+                    while($row=$rows->fetch_assoc()) {
+                        if ($level == $row['level_no']){
+                            $cur_max_sublevel = $row['sublevel_no'];
+                            break;
+                        }
+                    }
+                }
+                //redundant code ends here
+                /* For TEsting purpose
+                 * $level=5;
+                $max_level=8;
+                $cur_max_sublevel=8;
+                $sublevel=5;*/
+                $result[0]="\n";
+                //for completed levels
+                for ($i=1;$i<$level;$i++) {
+                    $result[0]=$result[0]."[[;".$this->DIR_COLOR.";]Level ".$i." 100% [===================='\]']\n";
+
+                }
+                $flag=true;
+                for ($i=($level==0?1:$level);$i<=$max_level;$i++) {
+                    $result[0]=$result[0]."Level ".$i." ".($i==$level?round($sublevel*100/$cur_max_sublevel)."%  ":"0%   ")."[";
+                    for ($j=1;$j<=20;$j++) {
+                        if ($flag && $j==round($sublevel*20/$cur_max_sublevel)) $flag=false;
+                        if ($flag) {
+                            $result[0]=$result[0]."=";
+                        }
+                        else
+                            $result[0]=$result[0].".";
+                    }
+                    $result[0]=$result[0]."]\n";
+                }
+                return $result;
+            }
 		}
 
 		public function submit($args) {
