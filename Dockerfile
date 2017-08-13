@@ -6,3 +6,6 @@
 #RUN apt-get install -y python
 FROM python:df
 
+RUN mkdir /tmp/user /tmp/answer
+
+ENV PYTHONPATH=/tmp/user

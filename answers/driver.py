@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 import ast
-
+from solution import main
 '''driver file running the program
 	takes the test cases from the answers/question_name file
 	and executes each test case. The output of each execution
@@ -20,7 +20,10 @@ s="" #return string
 
 for case in cases:
     if type(case) is tuple:
-        pass
+        if main(*case):
+            s+="1"
+        else:
+            s+="0"
     else:
         if main(case):
             s+="1"
