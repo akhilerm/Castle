@@ -193,7 +193,8 @@
                     $row=$rows->fetch_assoc();
                     $qs_name=$row['name'];
                     $qs_id=$row['id'];
-                    $output=shell_exec("cp -r ".$this->WORK_DIR."levels/".$qs_name." ".$this->WORK_DIR."users/".$_SESSION['USER_ID']."/".$qs_name);
+                    shell_exec("cp -r ".$this->WORK_DIR."levels/".$qs_name." ".$this->WORK_DIR."users/".$_SESSION['USER_ID']."/".$qs_name);
+                    shell_exec("echo \"def main(n):\" > ".$this->WORK_DIR."users/".$_SESSION['USER_ID']."/".$qs_name."/solution.py");//to copy solution file
                     $this->con->query("update users set level_id=".$qs_id." where id=".$_SESSION['USER_ID']);
                     //$result[]="New challenge [[;".$this->DIR_COLOR.";]".$qs_name."]/ added\n";
                     $result[]=is_writable($this->WORK_DIR."users");
