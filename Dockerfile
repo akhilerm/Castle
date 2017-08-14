@@ -1,13 +1,13 @@
-#FROM debian:jessie
+FROM debian:jessie
 
-#MAINTAINER Akhil Mohan "akhilerm@gmail.com"
+MAINTAINER Akhil Mohan "akhilerm@gmail.com"
 
-#RUN apt-get update
-#RUN apt-get install -y python
-#FROM python:df
+RUN apt-get update
+RUN apt-get install -y python
+RUN mkdir /tmp/user /tmp/answer
 
-#RUN mkdir /tmp/user /tmp/answer
+ENV PYTHONPATH=/tmp/user
 
-#ENV PYTHONPATH=/tmp/user
-FROM python:2
 CMD python /tmp/answer/driver.py
+
+#should include code to remove unwanted modules from python in next build
