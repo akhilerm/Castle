@@ -19,7 +19,7 @@ cases = [ast.literal_eval(x) for x in cases]
 
 s="" #return string
 number_of_cases = len(cases)/2
-time.sleep(5)
+time.sleep(10)
 for i in range(number_of_cases):
     if type(cases[i]) is tuple:
         if cases[number_of_cases+i] == solution.main(*cases):

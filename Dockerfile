@@ -8,6 +8,6 @@ RUN mkdir /tmp/user /tmp/answer
 
 ENV PYTHONPATH=/tmp/user
 
-CMD python /tmp/answer/driver.py
+CMD timeout 20 python /tmp/answer/driver.py
 
 #should include code to remove unwanted modules from python in next build
