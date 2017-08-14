@@ -4,8 +4,10 @@
 
 #RUN apt-get update
 #RUN apt-get install -y python
-FROM python:df
+#FROM python:df
 
-RUN mkdir /tmp/user /tmp/answer
+#RUN mkdir /tmp/user /tmp/answer
 
-ENV PYTHONPATH=/tmp/user
+#ENV PYTHONPATH=/tmp/user
+FROM python:2
+CMD python /tmp/answer/driver.py
