@@ -2,6 +2,7 @@
 
 import ast
 import solution
+import time
 '''driver file running the program
 	takes the test cases from the answers/question_name file
 	and executes each test case. The output of each execution
@@ -11,14 +12,14 @@ import solution
 	Resource/Time limit errors will be produced from docker container'''
 
 #opening and parsing test cases
-with open ("/tmp/answer/question_1") as file:
+with open ("/tmp/answer/question_1") as file: # change after development finishes
     cases=file.readlines();
 cases = [x.strip() for x in cases]
 cases = [ast.literal_eval(x) for x in cases]
 
 s="" #return string
 number_of_cases = len(cases)/2
-
+time.sleep(5)
 for i in range(number_of_cases):
     if type(cases[i]) is tuple:
         if cases[number_of_cases+i] == solution.main(*cases):
