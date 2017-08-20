@@ -19,8 +19,4 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/dashboard','adminControler@dashboard')->name('dashboard');
-
-Route::get('terminal',function (){
-    return view('terminal');
-});
+Route::post('/shell','adminControler@shell')->name('shell');
