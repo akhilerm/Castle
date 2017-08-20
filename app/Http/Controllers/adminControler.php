@@ -18,8 +18,8 @@ class adminControler extends Controller
             $req = Request::all();
 
             //check if func exist and call
-            if (method_exists($this,$req['method'])){
-                call_user_func( array($this, 'cd'),$req);
+            if (method_exists($this, $req['method'])){
+                return call_user_func( array($this, $req['method']),$req);
             }
 
             // The response
