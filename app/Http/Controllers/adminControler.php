@@ -2,23 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Libs\Server;
+use Request;
 
 class adminControler extends Controller
 {
     //
     public function __construct()
     {
-        $this->middleware('admin');
+        //$this->middleware('admin');
     }
 
-    public function dashboard()
+    public function shell()
     {
-        include app_path().'/functions/json-rpc.php';
-        handle_json_rpc(new Server());
-        return view('dasboard');
-        /*$result[] = "message received";
-        return $result;*/
+        if (Request::ajax()){
+            $req = Request::all();
+
+            //check if func exist and call
+            if (method_exists($this,$req['method'])){
+                call_user_func( array($this, "cd"),$req);
+            }
+
+            // The response
+            return response()->json($req);
+        }
     }
+
+    public function cd($args){
+       //Do stuff Here
+    }
+
+    public function request($args){
+        //Do stuff here
+    }
+
+
 }
