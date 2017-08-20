@@ -23,8 +23,8 @@
                 $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :[cmd.args]}, function (data) {
 
                     term.resume();
-                    if (cmd.name == "cd") {
-
+                    if (cmd.name == 'cd') {
+                        term.echo(data.result);
                     }
 
                 });
@@ -60,10 +60,10 @@
                 completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
                     callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
                 },
-                greetings: 'Mounting /home/<?php echo Auth::user(); ?>...',
+                greetings: 'Mounting /home/<?php echo Auth::user()['name']; ?>...',
                 name: 'js',
                 height: 200,
-                prompt: '@Castle:'
+                prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$'
             });
         });
     </script>
