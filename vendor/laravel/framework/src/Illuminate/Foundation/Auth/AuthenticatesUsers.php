@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 trait AuthenticatesUsers
 {
@@ -39,6 +40,7 @@ trait AuthenticatesUsers
         }
 
         if ($this->attemptLogin($request)) {
+            session(['pwd' => '~']);
             return $this->sendLoginResponse($request);
         }
 

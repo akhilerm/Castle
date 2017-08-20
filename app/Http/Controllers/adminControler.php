@@ -19,7 +19,7 @@ class adminControler extends Controller
 
             //check if func exist and call
             if (method_exists($this,$req['method'])){
-                call_user_func( array($this, "cd"),$req);
+                call_user_func( array($this, 'cd'),$req);
             }
 
             // The response
