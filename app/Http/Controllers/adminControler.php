@@ -15,10 +15,10 @@ class adminControler extends Controller
 
     public function dashboard()
     {
-        //include app_path().'/functions/json-rpc.php';
-        //handle_json_rpc(new Server());
-        //return view('dasboard');
-        $result[] = "message received";
-        return $result;
+        include app_path().'/functions/json-rpc.php';
+        handle_json_rpc(new Server());
+        return view('dasboard');
+        /*$result[] = "message received";
+        return $result;*/
     }
 }
