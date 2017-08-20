@@ -22,9 +22,10 @@
                 this.pause();
                 $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :[cmd.args]}, function (data) {
 
-                    //Do everyting here
-                    alert(data.method);
                     term.resume();
+                    if (cmd.name == "cd") {
+
+                    }
 
                 });
                 /*$.jrpc("http://localhost:8000/dashboard",cmd.name,[cmd.args],
@@ -59,7 +60,7 @@
                 completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
                     callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
                 },
-                greetings: 'Mounting /home/swaraj...',
+                greetings: 'Mounting /home/<?php echo Auth::user(); ?>...',
                 name: 'js',
                 height: 200,
                 prompt: '@Castle:'
