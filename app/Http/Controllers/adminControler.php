@@ -28,13 +28,49 @@ class adminControler extends Controller
     }
 
     public function cd($args){
-       $result['status']="Hello";
-       $result['MSG']="World";
-       return response()->json($result);
+        /*if ($this->check("cd", $args)) {
+            if ($args[0] == ".."){
+                session(['pwd'=>'~']);
+            }
+            else if ($args[0] != "."){
+                $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
+                if ($_SESSION['PWD']!='~') {
+                    $dir = $dir.explode("/", session('pwd'))[1].'/';
+                }
+                $files = preg_grep('/^([^.])/', scandir($dir));
+                $folder = "NIL";
+                foreach ($files as $file) {
+                    if (is_dir($dir.$file)) {
+                        $folder = $file;
+                    }
+                }
+                if ($folder!="NIL" && $folder ==$args[0]) {
+                    $_SESSION['PWD']="~/".$folder;
+                }
+                else{
+                    $result[0] = "\ncd: ".$args[0].": Not a directory\n";
+                    $result[1] = "false";
+                    return $result;
+                }
+
+            }
+
+            $result[0]=$_SESSION['USER_NAME'].'@Castle:'.$_SESSION['PWD'].'/$ ';
+            $result[1]="true";
+            return $result;
+        }*/
+        session(['pwd'=>'~']);
+        $result['STS']=true;
+        $result['MSG']=session('pwd');
+        return response()->json($request);
     }
 
     public function request($args){
         //Do stuff here
+    }
+
+    function check($command, $args) {
+        return true;
     }
 
 

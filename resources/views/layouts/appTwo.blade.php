@@ -24,7 +24,7 @@
 
                     term.resume();
                     if (cmd.name == "cd"){
-                        if (data['STS'] == "true")
+                        if (data['STS'] == true)
                             term.set_prompt(data['MSG']);
                         else
                             term.echo(data['MSG']);
