@@ -28,7 +28,9 @@ class adminControler extends Controller
     }
 
     public function cd($args){
-       //Do stuff Here
+       $result['status']="Hello";
+       $result['MSG']="World";
+       return response()->json($result);
     }
 
     public function request($args){
