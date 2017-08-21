@@ -23,8 +23,20 @@
                 $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :[cmd.args]}, function (data) {
 
                     term.resume();
-                    if (cmd.name == 'cd') {
-                        term.echo(data.result);
+                    if (cmd.name == "cd"){
+                        if (data['STS'] == "true")
+                            term.set_prompt(data['MSG']);
+                        else
+                            term.echo(data['MSG']);
+                    }
+                    else if (cmd.name == "test") {
+                        term.echo("\nRequesting challenge...\n");
+                        setTimeout(function () {
+                            term.echo(data.result);
+                        }, 200);
+                    }
+                    else {
+                        term.echo(data);
                     }
 
                 });
