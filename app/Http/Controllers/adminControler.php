@@ -7,9 +7,13 @@ use Request;
 class adminControler extends Controller
 {
     //
+    private $CMD_COLOR=;
+    private $DIR_COLOR=;
+    private $WORK_DIR=;
     public function __construct()
     {
         //$this->middleware('admin');
+
     }
 
     public function shell()
@@ -62,7 +66,7 @@ class adminControler extends Controller
         session(['pwd'=>'~']);
         $result['STS']=true;
         $result['MSG']=session('pwd');
-        return response()->json($request);
+        return response()->json($result);
     }
 
     public function request($args){
