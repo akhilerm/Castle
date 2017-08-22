@@ -7,13 +7,15 @@ use Request;
 class adminControler extends Controller
 {
     //
-    private $CMD_COLOR=;
-    private $DIR_COLOR=;
-    private $WORK_DIR=;
+    private $CMD_COLOR;
+    private $DIR_COLOR;
+    private $WORK_DIR;
     public function __construct()
     {
         //$this->middleware('admin');
-
+        $this->CMD_COLOR = '#FFA500';
+        $this->DIR_COLOR = '#0000FF';
+        $this->WORK_DIR = '/home/akhil/Work/HTML/www/term/';
     }
 
     public function shell()
@@ -32,13 +34,13 @@ class adminControler extends Controller
     }
 
     public function cd($args){
-        /*if ($this->check("cd", $args)) {
+        if ($this->check("cd", $args)) {
             if ($args[0] == ".."){
                 session(['pwd'=>'~']);
             }
             else if ($args[0] != "."){
                 $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
-                if ($_SESSION['PWD']!='~') {
+                if (session('pwd')!='~') {
                     $dir = $dir.explode("/", session('pwd'))[1].'/';
                 }
                 $files = preg_grep('/^([^.])/', scandir($dir));
@@ -49,7 +51,7 @@ class adminControler extends Controller
                     }
                 }
                 if ($folder!="NIL" && $folder ==$args[0]) {
-                    $_SESSION['PWD']="~/".$folder;
+                    session(['pwd'=>"~/".$folder]);
                 }
                 else{
                     $result[0] = "\ncd: ".$args[0].": Not a directory\n";
@@ -59,15 +61,38 @@ class adminControler extends Controller
 
             }
 
-            $result[0]=$_SESSION['USER_NAME'].'@Castle:'.$_SESSION['PWD'].'/$ ';
-            $result[1]="true";
-            return $result;
-        }*/
-        session(['pwd'=>'~']);
-        $result['STS']=true;
-        $result['MSG']=session('pwd');
+            $MSG=Auth::user()['name'].'@Castle:'.session('pwd').'/$ ';
+            $STS=true;
+        }
+        else {
+            $MSG='cd: '.args[0].': No such directory';
+            $STS=false;
+        }
+        $result['STS']=$STS;
+        $result['MSG']=$MSG;
         return response()->json($result);
     }
+
+    public function cat($args) {
+        if ($this->check("cat", $args)) {
+            $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
+            if (session('pwd')!='~') {
+                $dir = $dir.explode("/", session('pwd'))[1].'/';
+            }
+            $files = preg_grep('/^([^.])/', scandir($dir));
+            foreach ($files as $file) {
+                if (is_file($dir.$file) && $file == $args[0]) {
+                    $result['MSG'] = file_get_contents($dir.$file);
+                    $result['STS']=true;
+                    return response()->json($result);
+                }
+            }
+            $result[] = "cat: ".$args[0].": No such file";
+            return $result;
+        }
+    }
+
+    
 
     public function request($args){
         //Do stuff here
