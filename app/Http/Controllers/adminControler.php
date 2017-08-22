@@ -15,7 +15,7 @@ class adminControler extends Controller
         //$this->middleware('admin');
         $this->CMD_COLOR = '#FFA500';
         $this->DIR_COLOR = '#0000FF';
-        $this->WORK_DIR = '/home/akhil/Work/HTML/www/term/';
+        $this->WORK_DIR = '/home/akhil/Work/HTML/www/term/storage/app/public/';
     }
 
     public function shell()
@@ -87,12 +87,50 @@ class adminControler extends Controller
                     return response()->json($result);
                 }
             }
-            $result[] = "cat: ".$args[0].": No such file";
-            return $result;
+            $result['MSG'] = "cat: ".$args[0].": No such file";
+            $result['STS'] = false;
+            return response()->json($result);
         }
     }
 
-    
+    public function help($args)
+    {
+        if ($this->check("help", $args)) {
+            $result['MSG'] = "\nUse the following shell commands:
+[[;" . $this->CMD_COLOR . ";]cd]     - change directory [dir_name]
+[[;" . $this->CMD_COLOR . ";]cat]    - print file [file_name]
+[[;" . $this->CMD_COLOR . ";]clear]  - clear the terminal
+[[;" . $this->CMD_COLOR . ";]edit]   - open file in editor [file_name]
+[[;" . $this->CMD_COLOR . ";]ls]     - list directory contents [dir_name]
+[[;" . $this->CMD_COLOR . ";]logout] - logout from Castle
+[[;" . $this->CMD_COLOR . ";]request]- request a new challenge
+[[;" . $this->CMD_COLOR . ";]status] - print progress
+[[;" . $this->CMD_COLOR . ";]submit] - submit final solution for assessment [file_name]
+[[;" . $this->CMD_COLOR . ";]verify] - runs tests on solution file [file_name]\n";
+            $result['STS'] = true;
+            return response()->json($result);
+        }
+    }
+
+    public function ls($args) {
+        if ($this->check("ls", $args)) {
+            $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
+            if (session('pwd')!='~') {
+                $dir = $dir.explode("/", session('pwd'))[1].'/';
+            }
+            $files = preg_grep('/^([^.])/', scandir($dir));
+            $result['MSG']="\n";
+            foreach ($files as $file) {
+                if (is_dir($dir.$file)) {
+                    $result['MSG'] = $result['MSG']."[[;".$this->DIR_COLOR.";]".$file."/]\n";
+                }
+                else
+                    $result['MSG'] = $result['MSG'].$file."\n";
+            }
+            $result['STS']=true;
+        }
+        return response()->json($result);
+    }
 
     public function request($args){
         //Do stuff here

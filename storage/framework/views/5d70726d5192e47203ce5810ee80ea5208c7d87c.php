@@ -36,7 +36,7 @@
                         }, 200);
                     }
                     else {
-                        term.echo(data);
+                        term.echo(data['MSG']);
                     }
 
                 });
