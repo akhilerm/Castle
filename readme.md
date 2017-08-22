@@ -5,7 +5,7 @@ User has to navigate using terminal commands. Solution can be submitted currentl
 Once a question is completed, the user can request for new challenge.
 
 3 folders where question/answers are stored. In ./storage/app/public/
-
+```
 ./storage/app/public/
 ├── answers
 │   ├── driver.py
@@ -46,3 +46,4 @@ Once a question is completed, the user can request for new challenge.
         │   ├── constraints.txt
         │   └── solution.py
         └── readme.txt
+```
