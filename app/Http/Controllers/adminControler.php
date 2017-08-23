@@ -60,7 +60,7 @@ class adminControler extends Controller
 
                     Session::put('pwd', "~/$args[0]");
                     $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
-                    $sts  =true;
+                    $sts = true;
                     return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
 
                 }
@@ -75,7 +75,7 @@ class adminControler extends Controller
 
             //Keeping it in the same directory
             $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
-            $sts  =true;
+            $sts = true;
 
         }
 
