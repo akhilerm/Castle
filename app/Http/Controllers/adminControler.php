@@ -83,24 +83,31 @@ class adminControler extends Controller
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
     }
 
-    public function cat($args) {
-        if ($this->check("cat", $args)) {
-            $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
-            if (session('pwd')!='~') {
-                $dir = $dir.explode("/", session('pwd'))[1].'/';
-            }
-            $files = preg_grep('/^([^.])/', scandir($dir));
-            foreach ($files as $file) {
-                if (is_file($dir.$file) && $file == $args[0]) {
-                    $result['MSG'] = file_get_contents($dir.$file);
-                    $result['STS']=true;
-                    return response()->json($result);
-                }
-            }
-            $result['MSG'] = "cat: ".$args[0].": No such file";
-            $result['STS'] = false;
-            return response()->json($result);
+     /**
+     * Display contents of file.
+     *
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cat($args, $settings) {
+
+        $msg = 'No Such file';
+
+        //calculating present directory
+        $user_dir = $user_dir = $settings['WORK_DIR'].Auth::id().'/';
+        if (Session::get('pwd') !== '~' ){
+            $user_dir = $user_dir.Session::get('pwd').'/';
         }
+        $user_dir = "$user_dir$args[0]";
+
+        //Check IF file exist and get content
+        if(Storage::has($user_dir)){
+                $msg = Storage::get($user_dir);
+        }
+
+        return response()->json([ 'MSG' => $msg , 'STS'=> true]);
+
     }
 
     /**
@@ -110,7 +117,6 @@ class adminControler extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-
     public function help($args, $settings)
     {
 
