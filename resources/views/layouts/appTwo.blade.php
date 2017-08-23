@@ -47,7 +47,7 @@
                 greetings: 'Mounting /home/<?php echo Auth::user()['name']; ?>...',
                 name: 'js',
                 height: 200,
-                prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$'
+                prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
             });
         });
     </script>
