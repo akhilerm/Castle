@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('phone',13);
             $table->integer('active')->default(0);
             $table->boolean('role')->default(0);
+            $table->integer('level_id');
             $table->rememberToken();
             $table->timestamps();
         });
