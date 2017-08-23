@@ -40,11 +40,11 @@ class adminControler extends Controller
     public function cd($args, $settings)
     {
 
-        if ( $args[0] === '..' || $args[0] === '../' || $args[0] === '~'){
+        if ( $args[0] === '..' || $args[0] === '~'){
 
             Session::put('pwd', '~');
-            $msg = Auth::user()['name'].'@Castle: '.session('pwd').' $ ';
-            $sts  =true;
+            $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
+            $sts = true;
 
         }
         elseif ( $args[0] !==  '.'){
@@ -58,8 +58,8 @@ class adminControler extends Controller
                 $user_dir = "$user_dir/$args[0]";
                 if(Storage::has("$user_dir/")){
 
-                    Session::put('pwd', $args[0]);
-                    $msg = Auth::user()['name'].'@Castle: '.session('pwd').' $ ';
+                    Session::put('pwd', "~/$args[0]");
+                    $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
                     $sts  =true;
                     return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
 
@@ -74,7 +74,7 @@ class adminControler extends Controller
         } else{
 
             //Keeping it in the same directory
-            $msg = Auth::user()['name'].'@Castle: '.session('pwd').' $ ';
+            $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
             $sts  =true;
 
         }
