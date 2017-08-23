@@ -94,7 +94,7 @@ class adminControler extends Controller
         $msg = 'No Such file';
 
         //calculating present directory
-        $user_dir = $user_dir = $settings['WORK_DIR'].Auth::id().'/';
+        $user_dir = $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
         if (Session::get('pwd') !== '~' ){
             $user_dir = $user_dir.Session::get('pwd').'/';
         }
