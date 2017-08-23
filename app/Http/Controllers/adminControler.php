@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Request;
@@ -16,7 +17,7 @@ class adminControler extends Controller
         if (Request::ajax()){
 
             $req = Request::all();
-            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/users/'];
+            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
             //check if func exist and call
             if (method_exists($this, $req['method'])){
@@ -43,7 +44,7 @@ class adminControler extends Controller
         if ( $args[0] === '..' || $args[0] === '~'){
 
             Session::put('pwd', '~');
-            $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
+            $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
             $sts = true;
 
         }
@@ -138,8 +139,44 @@ class adminControler extends Controller
         return response()->json($result);
     }
 
-    public function request($args){
-        //Do stuff here
+    public function request($args, $settings)
+    {
+        $dir = $settings['WORK_DIR'].'users/'.Auth::id();
+        $list = $this->ls($dir, $settings);
+
+        // contains DIR color then, a folder is already present.
+        if (strpos($list['MSG'], $settings['DIR_COLOR']) !== false) {
+
+            $msg = 'You can request a new challenge only after completing the current challenge\n';
+
+        }
+        else {
+
+            $user_level = $this->getLevelData();
+
+            //Check the current status of user and increment it unless game is over
+            if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+
+                $msg = 'No more challenges. You did it.';
+                return response()->json([ 'STS' => true, 'MSG' => $msg]);
+
+            }
+            elseif ($user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+
+                $user_level['sublevel'] = 1;
+                $user_level['level']++;
+
+            }
+            else {
+
+                $user_level['sublevel']++;
+
+            }
+
+            //add code to start new countdown
+            $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");
+
+        }
     }
 
     function check($command, $args) {
@@ -147,4 +184,14 @@ class adminControler extends Controller
     }
 
 
+    /**
+     * CHANGE DIR: if arg is .. switch to home else switch to folder if exists
+     *
+     * @return array current level, current sublevel, max level and max sublevel
+     */
+
+    function getLevelData()
+    {
+        
+    }
 }

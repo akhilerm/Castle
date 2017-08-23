@@ -28,7 +28,7 @@
                         else
                             term.echo(data['MSG']);
                     }
-                    else if (cmd.name == "test") {
+                    else if (cmd.name == "request") {
                         term.echo("\nRequesting challenge...\n");
                         setTimeout(function () {
                             term.echo(data.result);
