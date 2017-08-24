@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use App\Models;
 use Request;
+
 
 class adminControler extends Controller
 {
@@ -50,7 +52,7 @@ class adminControler extends Controller
         elseif ( $args[0] !==  '.'){
 
             //ADDRESS TO  Users home directory
-            $user_dir = $settings['WORK_DIR'].Auth::id();
+            $user_dir = $settings['WORK_DIR'].'users/'.Auth::id();
 
             //Check if the folder exists if in home
             if(Session::get('pwd') === '~'){
@@ -59,7 +61,7 @@ class adminControler extends Controller
                 if(Storage::has("$user_dir/")){
 
                     Session::put('pwd', "~/$args[0]");
-                    $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
+                    $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
                     $sts = true;
                     return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
 
@@ -74,7 +76,7 @@ class adminControler extends Controller
         } else{
 
             //Keeping it in the same directory
-            $msg = Auth::user()['name'].'@Castle: '.session('pwd').'$ ';
+            $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
             $sts = true;
 
         }
@@ -124,7 +126,7 @@ class adminControler extends Controller
 
     }
 
-    public function ls($args) {
+    public function ls($args, $settings) {
         if ($this->check("ls", $args)) {
             $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
             if (session('pwd')!='~') {
@@ -158,6 +160,9 @@ class adminControler extends Controller
         else {
 
             $user_level = $this->getLevelData();
+            $msg = $user_level;
+
+            /*$user_level = $this->getLevelData();
 
             //Check the current status of user and increment it unless game is over
             if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['cur_max_sublevel']) {
@@ -179,8 +184,8 @@ class adminControler extends Controller
             }
 
             //add code to start new countdown
-            $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");
-
+            $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");*/
+            return response()->json(['STS' => true, 'MSG' => $msg]);
         }
     }
 
@@ -190,13 +195,14 @@ class adminControler extends Controller
 
 
     /**
-     * CHANGE DIR: if arg is .. switch to home else switch to folder if exists
+     * GET LEVEL: get all level associated data of the current user
      *
      * @return array current level, current sublevel, max level and max sublevel
      */
 
     function getLevelData()
     {
-
+        $level = Models\user::find(Auth::id());
+        return $level;
     }
 }
