@@ -21,7 +21,7 @@ class adminControler extends Controller
             if (!isset($req['args'])){
                 $req['args'] = [false];
             }
-            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/users/'];
+            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
             //check if func exist and call
             if (method_exists($this, $req['method'])){
@@ -48,20 +48,20 @@ class adminControler extends Controller
             if ($args[0] === '..' || $args[0] === '../' || $args[0] === '~') {
 
                 Session::put('pwd', '~');
-                $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
                 $sts = true;
 
             } elseif ($args[0] !== '.') {
 
                 //ADDRESS TO  Users home directory
-                $user_dir = $settings['WORK_DIR'] . Auth::id();
+                $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
 
                 //Check if the folder exists if in home
                 if (Session::get('pwd') === '~') {
                     $user_dir = "$user_dir/$args[0]";
                     if (Storage::has("$user_dir/")) {
                         Session::put('pwd', $args[0]);
-                        $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                        $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
                         $sts = true;
                         return response()->json(['STS' => $sts, 'MSG' => $msg]);
                     }
@@ -74,7 +74,7 @@ class adminControler extends Controller
             } else {
 
                 //Keeping it in the same directory
-                $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
                 $sts = true;
 
             }
@@ -101,7 +101,7 @@ class adminControler extends Controller
         $msg = 'No Such file';
         if ($args[0] !== false) {
             //calculating present directory
-            $user_dir = $user_dir = $settings['WORK_DIR'] . Auth::id() . '/';
+            $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
             if (Session::get('pwd') !== '~') {
                 $user_dir = $user_dir . Session::get('pwd') . '/';
             }
