@@ -12,4 +12,9 @@ class user extends Model
      * @var string
      */
     protected $table = 'users';
+
+    public function level()
+    {
+        return $this->belongsTo('App\Models\level');
+    }
 }

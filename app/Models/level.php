@@ -12,4 +12,9 @@ class level extends Model
      * @var string
      */
     protected $table = 'levels';
+
+    public function user()
+    {
+        return $this->hasMany('App\Models\user');
+    }
 }
