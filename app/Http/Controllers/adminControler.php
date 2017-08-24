@@ -131,24 +131,45 @@ class adminControler extends Controller
 
     }
 
-    public function ls($args, $settings) {
-        if ($this->check("ls", $args)) {
-            $dir = $this->WORK_DIR.'/users/'.Auth::user()['id'].'/';
-            if (session('pwd')!='~') {
-                $dir = $dir.explode("/", session('pwd'))[1].'/';
-            }
-            $files = preg_grep('/^([^.])/', scandir($dir));
-            $result['MSG']="\n";
-            foreach ($files as $file) {
-                if (is_dir($dir.$file)) {
-                    $result['MSG'] = $result['MSG']."[[;".$this->DIR_COLOR.";]".$file."/]\n";
-                }
-                else
-                    $result['MSG'] = $result['MSG'].$file."\n";
-            }
-            $result['STS']=true;
+    /**
+     * Function  to list the files in directory (present directory if arguments is null)
+     *
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function ls($args,$settings) {
+
+        //calculating present directory
+        $user_dir = $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
+        if (Session::get('pwd') !== '~' ){
+            $user_dir = $user_dir.Session::get('pwd').'/';
         }
-        return response()->json($result);
+        if ( $args[0] !== false){
+            $user_dir = "$user_dir$args[0]/";
+        }
+        $msg ='';
+        $user_dir = strtr($user_dir, ['//' => '/']);
+        if (Storage::has($user_dir)){
+            $files = Storage::files($user_dir);
+            $dirs = Storage::directories($user_dir);
+
+            $all_files = array_merge($files, $dirs);
+
+            //Fixing Format
+            $count = 0;
+            foreach ($all_files as $file){
+                if ($count !== 0){
+                    $msg  = "$msg\n";
+                }
+                $file = strtr($file, [$user_dir => '']);
+                $msg = "$msg$file";
+                $count++;
+            }
+
+        }
+
+        return response()->json([ 'MSG' => $msg , 'STS'=> true]);
     }
 
     public function request($args, $settings)
