@@ -31,7 +31,7 @@
                     else if (cmd.name == "request") {
                         term.echo("\nRequesting challenge...\n");
                         setTimeout(function () {
-                            term.echo(data.result);
+                            term.echo(data['MSG']);
                         }, 200);
                     }
                     else {

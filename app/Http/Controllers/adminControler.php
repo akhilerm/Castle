@@ -45,7 +45,7 @@ class adminControler extends Controller
     public function cd($args, $settings)
     {
         if ($args[0] !== false ) {
-            if ($args[0] === '..' || $args[0] === '../' || $args[0] === '~') {
+            if ($args[0] === '..' || $args[0] === '~') {
 
                 Session::put('pwd', '~');
                 $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
@@ -153,61 +153,78 @@ class adminControler extends Controller
 
     public function request($args, $settings)
     {
-        $dir = $settings['WORK_DIR'].'users/'.Auth::id();
-        $list = $this->ls($dir, $settings);
+        if ($args[0] !== false) {
+            $dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
+            $list = $this->ls($dir, $settings);
 
-        // contains DIR color then, a folder is already present.
-        if (strpos($list['MSG'], $settings['DIR_COLOR']) !== false) {
+            // contains DIR color then, a folder is already present.
+            if (strpos($list['MSG'], $settings['DIR_COLOR']) !== false) {
 
-            $msg = 'You can request a new challenge only after completing the current challenge\n';
+                $msg = 'You can request a new challenge only after completing the current challenge\n';
 
+            } else {
+
+                $user_level = $this->getLevelData();
+                $msg = $user_level;
+
+                /*$user_level = $this->getLevelData();
+
+                //Check the current status of user and increment it unless game is over
+                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+
+                    $msg = 'No more challenges. You did it.';
+                    return response()->json([ 'STS' => true, 'MSG' => $msg]);
+
+                }
+                elseif ($user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+
+                    $user_level['sublevel'] = 1;
+                    $user_level['level']++;
+
+                }
+                else {
+
+                    $user_level['sublevel']++;
+
+                }
+
+                //add code to start new countdown
+                $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");*/
+                return response()->json(['STS' => true, 'MSG' => $msg]);
+            }
         }
         else {
-
-            $user_level = $this->getLevelData();
-            $msg = $user_level;
-
-            /*$user_level = $this->getLevelData();
-
-            //Check the current status of user and increment it unless game is over
-            if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['cur_max_sublevel']) {
-
-                $msg = 'No more challenges. You did it.';
-                return response()->json([ 'STS' => true, 'MSG' => $msg]);
-
-            }
-            elseif ($user_level['sublevel'] == $user_level['cur_max_sublevel']) {
-
-                $user_level['sublevel'] = 1;
-                $user_level['level']++;
-
-            }
-            else {
-
-                $user_level['sublevel']++;
-
-            }
-
-            //add code to start new countdown
-            $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");*/
-            return response()->json(['STS' => true, 'MSG' => $msg]);
+            $sts = false;
+            $msg = $this->getLevelData();
         }
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
-
-    function check($command, $args) {
-        return true;
-    }
-
 
     /**
      * GET LEVEL: get all level associated data of the current user
      *
-     * @return array current level, current sublevel, max level and max sublevel
+     * @return array current level, current sublevel, max level and max sublevel of current level
      */
-
     function getLevelData()
     {
-        $level = Models\user::find(Auth::id());
-        return $level;
+        $level_id = Models\user::find(Auth::id())->first();
+        $level_data = Models\level::find($level_id->level_id);
+        $level = $level_data->level;
+        $sublevel = $level_data->sub_level;
+        $max_level = Models\level::orderBy('level', 'DESC')->first()->level;
+        $max_sublevel = Models\level::where('level', '=', $level)->orderBy('sub_level', 'DESC')->first()->sub_level;
+        return array('level' => $level, 'sublevel' => $sublevel, 'max_level' => $max_level, 'max_sublevel' => $max_sublevel);
+    }
+
+    /**
+     * CHECK ARGUMENTS: validate arguments passed for a command
+     * @param $command
+     * @param $args
+     * @return boolean true if correct number of arguments for the command else false
+     */
+    function check($command, $args)
+    {
+        //write code to check each command and its function.
+        return true;
     }
 }
