@@ -13,12 +13,15 @@ class adminControler extends Controller
 {
     //
 
-    public function shell()
+     public function shell()
     {
         if (Request::ajax()){
 
             $req = Request::all();
-            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
+            if (!isset($req['args'])){
+                $req['args'] = [false];
+            }
+            $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/users/'];
 
             //check if func exist and call
             if (method_exists($this, $req['method'])){
@@ -41,50 +44,52 @@ class adminControler extends Controller
 
     public function cd($args, $settings)
     {
+        if ($args[0] !== false ) {
+            if ($args[0] === '..' || $args[0] === '../' || $args[0] === '~') {
 
-        if ( $args[0] === '..' || $args[0] === '~'){
+                Session::put('pwd', '~');
+                $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                $sts = true;
 
-            Session::put('pwd', '~');
-            $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
-            $sts = true;
+            } elseif ($args[0] !== '.') {
 
-        }
-        elseif ( $args[0] !==  '.'){
+                //ADDRESS TO  Users home directory
+                $user_dir = $settings['WORK_DIR'] . Auth::id();
 
-            //ADDRESS TO  Users home directory
-            $user_dir = $settings['WORK_DIR'].'users/'.Auth::id();
-
-            //Check if the folder exists if in home
-            if(Session::get('pwd') === '~'){
-
-                $user_dir = "$user_dir/$args[0]";
-                if(Storage::has("$user_dir/")){
-
-                    Session::put('pwd', "~/$args[0]");
-                    $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
-                    $sts = true;
-                    return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
-
+                //Check if the folder exists if in home
+                if (Session::get('pwd') === '~') {
+                    $user_dir = "$user_dir/$args[0]";
+                    if (Storage::has("$user_dir/")) {
+                        Session::put('pwd', $args[0]);
+                        $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                        $sts = true;
+                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+                    }
                 }
 
+                //No Directory
+                $msg = "cd: $args[0]: No such directory";
+                $sts = false;
+
+            } else {
+
+                //Keeping it in the same directory
+                $msg = Auth::user()['name'] . '@Castle: ' . session('pwd') . ' $ ';
+                $sts = true;
+
             }
-
-            //No Directory
-            $msg="cd: $args[0]: No such directory";
-            $sts=false;
-
         } else{
 
-            //Keeping it in the same directory
-            $msg = Auth::user()['name'].'@Castle:'.session('pwd').'$ ';
-            $sts = true;
+            $sts = false;
+            $msg = "No Directory";
 
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
+
     }
 
-     /**
+    /**
      * Display contents of file.
      *
      * @param $args
@@ -94,19 +99,19 @@ class adminControler extends Controller
     public function cat($args, $settings) {
 
         $msg = 'No Such file';
+        if ($args[0] !== false) {
+            //calculating present directory
+            $user_dir = $user_dir = $settings['WORK_DIR'] . Auth::id() . '/';
+            if (Session::get('pwd') !== '~') {
+                $user_dir = $user_dir . Session::get('pwd') . '/';
+            }
+            $user_dir = "$user_dir$args[0]";
 
-        //calculating present directory
-        $user_dir = $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
-        if (Session::get('pwd') !== '~' ){
-            $user_dir = $user_dir.Session::get('pwd').'/';
-        }
-        $user_dir = "$user_dir$args[0]";
-
-        //Check IF file exist and get content
-        if(Storage::has($user_dir)){
+            //Check IF file exist and get content
+            if (Storage::has($user_dir)) {
                 $msg = Storage::get($user_dir);
+            }
         }
-
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
 
     }
