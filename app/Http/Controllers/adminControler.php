@@ -165,18 +165,15 @@ class adminControler extends Controller
             } else {
 
                 $user_level = $this->getLevelData();
-                $msg = $user_level;
-
-                /*$user_level = $this->getLevelData();
 
                 //Check the current status of user and increment it unless game is over
-                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
                     $msg = 'No more challenges. You did it.';
                     return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
                 }
-                elseif ($user_level['sublevel'] == $user_level['cur_max_sublevel']) {
+                elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
 
                     $user_level['sublevel'] = 1;
                     $user_level['level']++;
@@ -189,13 +186,13 @@ class adminControler extends Controller
                 }
 
                 //add code to start new countdown
-                $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");*/
+                $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");
                 return response()->json(['STS' => true, 'MSG' => $msg]);
             }
         }
         else {
             $sts = false;
-            $msg = $this->getLevelData();
+            $msg = 'request: too many arguments';
         }
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
