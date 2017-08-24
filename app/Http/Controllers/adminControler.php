@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -145,7 +146,7 @@ class adminControler extends Controller
     public function ls($args,$settings) {
 
         //calculating present directory
-        $user_dir = $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
+        $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
         if (Session::get('pwd') !== '~' ){
             $user_dir = $user_dir.Session::get('pwd').'/';
         }
@@ -180,16 +181,22 @@ class adminControler extends Controller
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
     }
 
+    /**
+     * REQUEST CHALLENGE: request a new challenge
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function request($args, $settings)
     {
-        if ($args[0] !== false) {
-            $dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
-            $list = $this->ls($dir, $settings);
+        if ($args[0] === false) {
+            $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
 
-            // contains DIR color then, a folder is already present.
-            if (strpos($list['MSG'], $settings['DIR_COLOR']) !== false) {
+            //check if any directories are already present
+            if (sizeof($list) > 0) {
 
-                $msg = 'You can request a new challenge only after completing the current challenge\n';
+                $sts = true;
+                $msg = "You can request a new challenge only after completing the current challenge. \n";
 
             } else {
 
@@ -214,9 +221,21 @@ class adminControler extends Controller
 
                 }
 
+                $new_level = Models\level::where(['level', '=', $user_level['level'], ['sub_level', '=', $user_level['sublevel']]])->inRandomOrder()->first();
+                $question_name = $new_level->name;
+                $question_id = $new_level->id;
+                //copy question to user directory
+                /*shell_exec("cp -r ".$settings['WORK_DIR']."levels/".$question_name." ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
+                //create solution.py file
+                shell_exec("echo \"def main(n):\" > ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name."/solution.py");
+                //update user table with new level id
+                $user = Models\user::find(Auth::id());
+                $user->level_id = $question_id;
+                $user->save();*/
                 //add code to start new countdown
-                $row = DB::select("select id, name from levels where level_no = ".$user_level['level']." and sublevel_no = ".$user_level['sublevel']." order by rand() limit 1");
-                return response()->json(['STS' => true, 'MSG' => $msg]);
+
+                $sts = true;
+                $msg = 'New challenge added.';
             }
         }
         else {

@@ -29,7 +29,7 @@
                             term.echo(data['MSG']);
                     }
                     else if (cmd.name == "request") {
-                        term.echo("\nRequesting challenge...\n");
+                        term.echo("\nRequesting challenge...");
                         setTimeout(function () {
                             term.echo(data['MSG']);
                         }, 200);
