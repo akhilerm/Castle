@@ -110,6 +110,10 @@ class adminControler extends Controller
             //Check IF file exist and get content
             if (Storage::has($user_dir)) {
                 $msg = Storage::get($user_dir);
+
+                //check if the file is a directory
+                if ($msg == '')
+                    $msg = "cat: $args[0]: is a directory";
             }
         }
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
@@ -153,6 +157,10 @@ class adminControler extends Controller
         if (Storage::has($user_dir)){
             $files = Storage::files($user_dir);
             $dirs = Storage::directories($user_dir);
+
+            //add color to directory
+            if (sizeof($dirs) > 0)
+                $dirs[0] = "[[;".$settings['DIR_COLOR'].";]$dirs[0]]";
 
             $all_files = array_merge($files, $dirs);
 
