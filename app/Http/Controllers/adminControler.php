@@ -231,7 +231,7 @@ class adminControler extends Controller
                 $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
                 $question_name = $new_level->name;
                 $question_id = $new_level->id;
-                $full_path = "/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR'];
+                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
                 //copy question to user directory -- will not work with $settings['WORK_DIR']
                 shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
                 //create solution.py file
@@ -329,7 +329,7 @@ class adminControler extends Controller
         if ($args[0] === false) {
             $level_id = Models\user::find(Auth::id())->first()->level_id;
             $question_name = Models\level::find($level_id)->name;
-            $full_path = "/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR'];
+            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
             //executing the code
             $output = shell_exec("/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
             $sts = true;
