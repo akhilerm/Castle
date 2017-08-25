@@ -22,31 +22,6 @@
                 this.pause();
                 $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :cmd.args}, function (data) {
                     term.resume();
-                    /*if (cmd.name == "cd"){
-                        if (data['STS'] == true)
-                            term.set_prompt(data['MSG']);
-                        else
-                            term.echo(data['MSG']);
-                    }
-                    else if (cmd.name == "request") {
-                        term.echo("\nRequesting challenge...");
-                        setTimeout(function () {
-                            term.echo(data['MSG']);
-                        }, 200);
-
-                    }
-                    else if (cmd.name == "clear") {
-                        term.clear();
-                    }
-                    else if (cmd.name == "submit"){
-                        //change prompt if succesfully submitted
-                        if (data['STS'] == true)
-                            term.set_prompt('<?php Auth::user()['name'] ?>@Castle:~$ ');
-                        term.echo(data['MSG']);
-                    }
-                    else {
-                        term.echo(data['MSG']);
-                    }*/
                     switch (cmd.name){
                         case "cd":
                             if (data['STS'] == true)
@@ -71,6 +46,11 @@
                             else{
                                 term.echo(data['MSG']);
                             }
+                            break;
+                        case "submit":
+                            if (data['STS'] == true)
+                                term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
+                            term.echo(data['MSG']);
                             break;
                         default:
                             term.echo(data['MSG']);
