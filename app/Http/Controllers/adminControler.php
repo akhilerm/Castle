@@ -29,8 +29,12 @@ class adminControler extends Controller
                 return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
             }
 
-            // The response
-            return response()->json(['args'=>$req['method']]);
+            // The response. check if no command was passed or invalid command
+            if (!isset($req['method']))
+                $msg = '';
+            else
+                $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
+            return response()->json(['MSG' => $msg]);
         }
     }
 
@@ -130,8 +134,10 @@ class adminControler extends Controller
      */
     public function help($args, $settings)
     {
-
-        $msg  = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
+        if ($this->check("help", $args))
+            $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
+        else
+            $msg = "help: too many arguments";
         return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
     }
@@ -225,9 +231,9 @@ class adminControler extends Controller
                 $question_name = $new_level->name;
                 $question_id = $new_level->id;
                 //copy question to user directory -- will not work with $settings['WORK_DIR']
-                shell_exec("cp -r ".$settings['WORK_DIR']."levels/".$question_name." ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
+                shell_exec("cp -r /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."levels/".$question_name." /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
                 //create solution.py file
-                shell_exec("echo \"def main(n):\" > ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name."/solution.py");
+                shell_exec("echo \"def main(n):\" > /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name."/solution.py");
                 //update user table with new level id
                 $user = Models\user::find(Auth::id());
                 $user->level_id = $question_id;
@@ -300,6 +306,28 @@ class adminControler extends Controller
     }
 
     /**
+     * SUBMIT THE SOLUTION: submit the solution. solution will be submitted only if all test cases are passed.
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function submit($args, $settings)
+    {
+
+    }
+
+    /**
+     * VERIFY : the submitted solution will be executed and checked against a given set of test cases.
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verify($args, $settings)
+    {
+
+    }
+
+    /**
      * GET LEVEL: get all level associated data of the current user
      *
      * @return array current level, current sublevel, max level and max sublevel of current level
@@ -324,6 +352,10 @@ class adminControler extends Controller
     function check($command, $args)
     {
         //write code to check each command and its function.
-        return true;
+        switch ($command) {
+            case "help":
+                return true;
+        }
+
     }
 }

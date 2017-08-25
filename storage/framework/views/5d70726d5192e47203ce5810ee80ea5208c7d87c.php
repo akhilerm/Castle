@@ -34,6 +34,9 @@
                             term.echo(data['MSG']);
                         }, 200);
                     }
+                    else if (cmd.name == "clear") {
+                        term.clear();
+                    }
                     else {
                         term.echo(data['MSG']);
                     }
