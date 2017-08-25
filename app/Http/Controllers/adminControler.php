@@ -314,8 +314,9 @@ class adminControler extends Controller
      */
     public function submit($args, $settings)
     {
-        if (args[0] ===  false) {
+        if ($args[0] ==  false) {
             $output = $this->verify($args, $settings);
+            $output = json_decode($output->content(), true);
             //check if verification was successful
             if ($output['STS'] == true) {
                 $sts = true;
@@ -324,7 +325,7 @@ class adminControler extends Controller
                 $level_id = Models\user::find(Auth::id())->first()->level_id;
                 $question_name = Models\level::find($level_id)->name;
                 //remove questionfolder
-                shell_exec("rm -r $full_path/users/".Auth::id().$question_name);
+                shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
                 //change pwd
                 Session::put('pwd', '~');
                 //add code for removing countdown
@@ -334,7 +335,7 @@ class adminControler extends Controller
                 $msg = 'Solution can be submitted only after successful verification';
             }
         }
-        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+        return response()->json(['STS' => true, 'MSG' => $msg]);
     }
 
     /**
