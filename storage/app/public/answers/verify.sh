@@ -22,7 +22,7 @@ if [ -z "$result" ];
     echo "Resource limit reached"
 elif [[ $result == *"Traceback"* ]];
     then echo "FAIL"
-    echo "Error in solution"
+    echo "Error in "$filename
 else
     echo "TRUE"
     echo $result

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -230,10 +231,11 @@ class adminControler extends Controller
                 $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
                 $question_name = $new_level->name;
                 $question_id = $new_level->id;
+                $full_path = "/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR'];
                 //copy question to user directory -- will not work with $settings['WORK_DIR']
-                shell_exec("cp -r /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."levels/".$question_name." /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
+                shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
                 //create solution.py file
-                shell_exec("echo \"def main(n):\" > /home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name."/solution.py");
+                shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
                 //update user table with new level id
                 $user = Models\user::find(Auth::id());
                 $user->level_id = $question_id;
@@ -324,7 +326,39 @@ class adminControler extends Controller
      */
     public function verify($args, $settings)
     {
+        if ($args[0] === false) {
+            $level_id = Models\user::find(Auth::id())->first()->level_id;
+            $question_name = Models\level::find($level_id)->name;
+            $full_path = "/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR'];
+            //executing the code
+            $output = shell_exec("/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
+            $sts = true;
+            $output_array = explode("\n", $output);
+            //check the result of execution, if execution has failed or not
+            if ($output_array[0] == 'FAIL') {
+                $msg = "[[;#FF0000;]$output_array[1]]";
+            }
+            else {
+                //successfull execution, no. of test cases satisfied
+                if ($output_array[1] == '1111111111') {
+                    $msg = "All test cases passed";
+                }
+                else {
+                    $msg = "\n";
+                    //customizing color for each test case depending on pass/fail
+                    for ($i = 1; $i <= 10; $i++ ) {
+                        if ($output_array[1][$i-1] == 0) {
+                            $msg = $msg."[[;#FF0000;]Test $i failed]\n";
+                        }
+                        else {
+                            $msg = $msg."Test $i passed\n";
+                        }
+                    }
+                }
+            }
 
+        }
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
     /**
@@ -334,8 +368,8 @@ class adminControler extends Controller
      */
     function getLevelData()
     {
-        $level_id = Models\user::find(Auth::id())->first();
-        $level_data = Models\level::find($level_id->level_id);
+        $level_id = Models\user::find(Auth::id())->first()->level_id;
+        $level_data = Models\level::find($level_id);
         $level = $level_data->level;
         $sublevel = $level_data->sub_level;
         $max_level = Models\level::orderBy('level', 'DESC')->first()->level;
