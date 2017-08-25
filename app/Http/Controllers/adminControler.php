@@ -221,17 +221,17 @@ class adminControler extends Controller
 
                 }
 
-                $new_level = Models\level::where(['level', '=', $user_level['level'], ['sub_level', '=', $user_level['sublevel']]])->inRandomOrder()->first();
+                $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
                 $question_name = $new_level->name;
                 $question_id = $new_level->id;
-                //copy question to user directory
-                /*shell_exec("cp -r ".$settings['WORK_DIR']."levels/".$question_name." ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
+                //copy question to user directory -- will not work with $settings['WORK_DIR']
+                shell_exec("cp -r ".$settings['WORK_DIR']."levels/".$question_name." ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name);
                 //create solution.py file
                 shell_exec("echo \"def main(n):\" > ".$settings['WORK_DIR']."users/".Auth::id()."/".$question_name."/solution.py");
                 //update user table with new level id
                 $user = Models\user::find(Auth::id());
                 $user->level_id = $question_id;
-                $user->save();*/
+                $user->save();
                 //add code to start new countdown
 
                 $sts = true;
@@ -242,6 +242,60 @@ class adminControler extends Controller
             $sts = false;
             $msg = 'request: too many arguments';
         }
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+    }
+
+    /**
+     * STATUS: current level status of the user
+     * @param $args
+     * @param $settings
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function status($args, $settings)
+    {
+        if ($args[0] === false) {
+            $user_level = $this->getLevelData();
+
+            $sts = true;
+            $msg = "\n";
+
+            /*//Testing purpose
+                $user_level['level']=5;
+                $user_level['max_level']=8;
+                $user_level['max_sublevel']=8;
+                $user_level['sublevel']=5;*/
+
+
+            //for completed levels
+            for ($i = 1; $i < $user_level['level']; $i++) {
+                $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
+                $msg = "$msg\n";
+            }
+
+            //for partially completed levels
+            $flag = true;
+            $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
+            for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
+                $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
+                for ($j = 1; $j <= 20; $j++) {
+
+                    if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
+                        $flag=false;
+
+                    if ($flag) {
+                        $msg = $msg."=";
+                    }
+                    else
+                        $msg = $msg.".";
+                }
+                $msg = $msg."]\n";
+            }
+        }
+        else {
+            $sts = false;
+            $msg = 'status: too many arguments';
+        }
+
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
