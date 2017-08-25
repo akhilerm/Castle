@@ -392,4 +392,14 @@ class adminControler extends Controller
         }
 
     }
+
+    public function logout($args, $settings){
+        if ($args[0] === false) {
+            Auth::logout();
+            Session::flush();
+            return response()->json(['MSG' => 'logged out', 'STS' => true]);
+        }
+        return response()->json(['MSG' => 'invalid argument', 'STS' => false]);
+    }
+
 }
