@@ -22,7 +22,7 @@
                 this.pause();
                 $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :cmd.args}, function (data) {
                     term.resume();
-                    if (cmd.name == "cd"){
+                    /*if (cmd.name == "cd"){
                         if (data['STS'] == true)
                             term.set_prompt(data['MSG']);
                         else
@@ -39,7 +39,37 @@
                     }
                     else {
                         term.echo(data['MSG']);
-                    }
+                    }*/
+                    switch (cmd.name){
+                        case "cd":
+                            if (data['STS'] == true)
+                                term.set_prompt(data['MSG']);
+                            else
+                                term.echo(data['MSG']);
+                            break;
+                        case "request":
+                            term.echo("\nRequesting challenge...");
+                            setTimeout(function () {
+                                term.echo(data['MSG']);
+                            }, 200);
+                            break;
+                        case "clear":
+                            term.clear();
+                            break;
+                        case "logout":
+                            if (data['STS'] == true) {
+                                term.echo(data['MSG']);
+                                location.reload();
+                            }
+                            else{
+                                term.echo(data['MSG']);
+                            }
+                            break;
+                        default:
+                            term.echo(data['MSG']);
+                            break;
+
+                    };
 
                 });
             }, {
