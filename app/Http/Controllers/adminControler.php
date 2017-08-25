@@ -227,7 +227,6 @@ class adminControler extends Controller
                     $user_level['sublevel']++;
 
                 }
-
                 $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
                 $question_name = $new_level->name;
                 $question_id = $new_level->id;
@@ -315,7 +314,27 @@ class adminControler extends Controller
      */
     public function submit($args, $settings)
     {
-
+        if (args[0] ===  false) {
+            $output = $this->verify($args, $settings);
+            //check if verification was successful
+            if ($output['STS'] == true) {
+                $sts = true;
+                $msg = 'Solution submitted successfully';
+                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+                $level_id = Models\user::find(Auth::id())->first()->level_id;
+                $question_name = Models\level::find($level_id)->name;
+                //remove questionfolder
+                shell_exec("rm -r $full_path/users/".Auth::id().$question_name);
+                //change pwd
+                Session::put('pwd', '~');
+                //add code for removing countdown
+            }
+            else {
+                $sts = false;
+                $msg = 'Solution can be submitted only after successful verification';
+            }
+        }
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
     /**
@@ -331,8 +350,8 @@ class adminControler extends Controller
             $question_name = Models\level::find($level_id)->name;
             $full_path = storage_path()."/app/".$settings['WORK_DIR'];
             //executing the code
-            $output = shell_exec("/home/akhil/Work/HTML/www/term/storage/app/".$settings['WORK_DIR']."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
-            $sts = true;
+            $output = shell_exec($full_path."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
+            $sts = false;
             $output_array = explode("\n", $output);
             //check the result of execution, if execution has failed or not
             if ($output_array[0] == 'FAIL') {
@@ -342,6 +361,7 @@ class adminControler extends Controller
                 //successfull execution, no. of test cases satisfied
                 if ($output_array[1] == '1111111111') {
                     $msg = "All test cases passed";
+                    $sts = true;
                 }
                 else {
                     $msg = "\n";
