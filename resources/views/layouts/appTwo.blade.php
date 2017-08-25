@@ -33,9 +33,16 @@
                         setTimeout(function () {
                             term.echo(data['MSG']);
                         }, 200);
+
                     }
                     else if (cmd.name == "clear") {
                         term.clear();
+                    }
+                    else if (cmd.name == "submit"){
+                        //change prompt if succesfully submitted
+                        if (data['STS'] == true)
+                            term.set_prompt('<?php Auth::user()['name'] ?>@Castle:~$ ');
+                        term.echo(data['MSG']);
                     }
                     else {
                         term.echo(data['MSG']);
