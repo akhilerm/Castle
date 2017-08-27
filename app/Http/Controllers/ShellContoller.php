@@ -438,16 +438,23 @@ class ShellContoller extends Controller
         $file = false;
 
         if ( $args[0] !== false && !isset($args[1])) {
-            //calculating present directory
-            $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
-            if (Session::get('pwd') !== '~') {
-                $user_dir = $user_dir . Session::get('pwd') . '/';
+            if (strpos($args[0], 'solution') !== false) {
+                //calculating present directory
+                $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
+                if (Session::get('pwd') !== '~') {
+                    $user_dir = $user_dir . Session::get('pwd') . '/';
+                }
+                $user_dir = "$user_dir$args[0]";
+                if (Storage::has($user_dir)) {
+                    $msg = Storage::get($user_dir);
+                    $file = $user_dir;
+                    $sts = true;
+                }
             }
-            $user_dir = "$user_dir$args[0]";
-            if (Storage::has($user_dir)) {
-                $msg = Storage::get($user_dir);
-                $file = $user_dir;
-                $sts = true;
+            else {
+                $msg = 'File not editable';
+                $sts = false;
+                $file = '';
             }
             //$msg = $user_dir;
         }
