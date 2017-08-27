@@ -19,4 +19,6 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::post('/shell','adminControler@shell')->name('shell');
+Route::post('/shell','ShellContoller@shell')->name('shell');
+
+Route::post('/editor', 'EditorController@index')->name('editor');
