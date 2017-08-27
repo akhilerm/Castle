@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Models;
+use Psy\Util\Str;
 use Request;
 
-
-class adminControler extends Controller
+class ShellContoller extends Controller
 {
     //
 
-     public function shell()
+    public function shell()
     {
         if (Request::ajax()){
 
@@ -414,6 +414,13 @@ class adminControler extends Controller
 
     }
 
+    /**
+     *Signout
+     *
+     * @param $args
+     * @param $settings
+     * @return JsonResponse
+     */
     public function logout($args, $settings){
         if ($args[0] === false) {
             Auth::logout();
@@ -421,6 +428,32 @@ class adminControler extends Controller
             return response()->json(['MSG' => 'logged out', 'STS' => true]);
         }
         return response()->json(['MSG' => 'invalid argument', 'STS' => false]);
+    }
+
+
+    public function  edit($args, $settings){
+
+        $msg = 'No Such File';
+        $sts = false;
+        $file = false;
+
+        if ( $args[0] !== false && !isset($args[1])) {
+            //calculating present directory
+            $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
+            if (Session::get('pwd') !== '~') {
+                $user_dir = $user_dir . Session::get('pwd') . '/';
+            }
+            $user_dir = "$user_dir$args[0]";
+            if (Storage::has($user_dir)) {
+                $msg = Storage::get($user_dir);
+                $file = $user_dir;
+                $sts = true;
+            }
+            //$msg = $user_dir;
+        }
+
+        return response()->json(['MSG' => $msg, 'STS' => $sts, 'FILE' => $file]);
+
     }
 
 }
