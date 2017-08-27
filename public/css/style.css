@@ -1,0 +1,36 @@
+
+.editor{
+    background-color: #B084CC;
+    height:500px;
+    margin:3vh;
+}
+
+.navigation{
+    background-color: #B084CC;
+    width: 100%;
+}
+
+i{
+    color: white;
+}
+
+.row{
+    margin:0px;
+    padding:0px;
+}
+
+.input-block{
+    height: 90%;
+}
+
+#input{
+    height: 100%;
+    width: 100%;
+    resize: none;
+    color: #6B5E62;
+    background-color: #d6e9c6;
+}
+
+.row .col{
+    padding: 0px;
+}
