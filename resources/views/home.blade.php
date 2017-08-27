@@ -20,6 +20,27 @@
     <link href="css/jquery.terminal-1.5.3.css" rel="stylesheet"/>
 
     <script>
+        var editor;
+        var fileName = false;
+
+        $(document).ready(function () {
+
+            editor = $("#input");
+            $("#save").click(function () {
+                if(fileName !== false){
+                    $.post("/editor",{ '_token': $('meta[name=csrf-token]').attr('content'), value: editor.val(), file: fileName}, function (data) {
+                        alert(data['MSG']);
+                    }).fail(function(response) {
+                        alert('Error: ' + response.responseText);
+                    });
+                } else{
+                    alert("Make Sure File is open");
+                }
+            });
+
+        });
+
+
         jQuery(function($, undefined) {
             $('#term').terminal(function(command, term) {
                 var cmd = $.terminal.parse_command(command);
@@ -28,7 +49,7 @@
                     term.resume();
                     switch (cmd.name){
                         case "cd":
-                            if (data['STS'] == true)
+                            if (data['STS'] === true)
                                 term.set_prompt(data['MSG']);
                             else
                                 term.echo(data['MSG']);
@@ -43,7 +64,7 @@
                             term.clear();
                             break;
                         case "logout":
-                            if (data['STS'] == true) {
+                            if (data['STS'] === true) {
                                 term.echo(data['MSG']);
                                 location.reload();
                             }
@@ -52,9 +73,17 @@
                             }
                             break;
                         case "submit":
-                            if (data['STS'] == true)
+                            if (data['STS'] === true)
                                 term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
                             term.echo(data['MSG']);
+                            break;
+                        case "edit":
+                            if(data["STS"] === true){
+                                editor.val(data['MSG']);
+                                fileName = data['FILE'];
+                            } else{
+                                term.echo(data['MSG']);
+                            }
                             break;
                         default:
                             term.echo(data['MSG']);
@@ -103,7 +132,7 @@
                 <div class="col s9">
                     <h5 class="white-text">File name</h5>
                 </div>
-                <div class="col s1">
+                <div class="col s1" id="save">
                     <i class="material-icons">save</i>
                 </div>
                 <div class="col s1">
@@ -117,11 +146,9 @@
         </div>
     </div>
 
-
-
-<!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
-<script src="{{ asset('js/app.js') }}"></script>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
 
