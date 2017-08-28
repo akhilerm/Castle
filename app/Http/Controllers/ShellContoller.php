@@ -289,7 +289,7 @@ class ShellContoller extends Controller
             $msg = 'New challenge added.';
 
         }
-        
+
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
@@ -301,47 +301,41 @@ class ShellContoller extends Controller
      */
     public function status($args, $settings)
     {
-        if ($args[0] === false) {
-            $user_level = $this->getLevelData();
+        $user_level = $this->getLevelData();
 
-            $sts = true;
-            $msg = "\n";
+        $sts = true;
+        $msg = "\n";
 
-            /*//Testing purpose
-                $user_level['level']=5;
-                $user_level['max_level']=8;
-                $user_level['max_sublevel']=8;
-                $user_level['sublevel']=5;*/
+        /*//Testing purpose
+            $user_level['level']=5;
+            $user_level['max_level']=8;
+            $user_level['max_sublevel']=8;
+            $user_level['sublevel']=5;*/
 
 
-            //for completed levels
-            for ($i = 1; $i < $user_level['level']; $i++) {
-                $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
-                $msg = "$msg\n";
-            }
-
-            //for partially completed levels
-            $flag = true;
-            $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
-            for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
-                $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
-                for ($j = 1; $j <= 20; $j++) {
-
-                    if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
-                        $flag=false;
-
-                    if ($flag) {
-                        $msg = $msg."=";
-                    }
-                    else
-                        $msg = $msg.".";
-                }
-                $msg = $msg."]\n";
-            }
+        //for completed levels
+        for ($i = 1; $i < $user_level['level']; $i++) {
+            $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
+            $msg = "$msg\n";
         }
-        else {
-            $sts = false;
-            $msg = 'status: too many arguments';
+
+        //for partially completed levels
+        $flag = true;
+        $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
+        for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
+            $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
+            for ($j = 1; $j <= 20; $j++) {
+
+                if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
+                    $flag=false;
+
+                if ($flag) {
+                    $msg = $msg."=";
+                }
+                else
+                    $msg = $msg.".";
+            }
+            $msg = $msg."]\n";
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
@@ -355,27 +349,31 @@ class ShellContoller extends Controller
      */
     public function submit($args, $settings)
     {
-        if ($args[0] !==  false) {
-            $output = $this->verify($args, $settings);
-            $output = json_decode($output->content(), true);
-            //check if verification was successful
-            if ($output['STS'] == true) {
-                $sts = true;
-                $msg = 'Solution submitted successfully';
-                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-                $level_id = Models\user::find(Auth::id())->first()->level_id;
-                $question_name = Models\level::find($level_id)->name;
-                //remove questionfolder
-                shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
-                //change pwd
-                Session::put('pwd', '~');
-                //add code for removing countdown
-            }
-            else {
-                $sts = false;
-                $msg = 'Solution can be submitted only after successful verification';
-            }
+        $output = $this->verify($args, $settings);
+        $output = json_decode($output->content(), true);
+
+        //check if verification was successful
+        if ($output['STS'] == true) {
+
+            $sts = true;
+            $msg = 'Solution submitted successfully';
+            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            $level_id = Models\user::find(Auth::id())->first()->level_id;
+            $question_name = Models\level::find($level_id)->name;
+            //remove question folder
+            shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
+            //change pwd
+            Session::put('pwd', '~');
+            //add code for removing countdown
+
         }
+        else {
+
+            $sts = false;
+            $msg = 'Solution can be submitted only after successful verification';
+
+        }
+
         return response()->json(['STS' => true, 'MSG' => $msg]);
     }
 
@@ -387,39 +385,49 @@ class ShellContoller extends Controller
      */
     public function verify($args, $settings)
     {
-        if ($args[0] === false) {
+        if (strpos($args[0], 'solution') !== false) {
+
             $level_id = Models\user::find(Auth::id())->first()->level_id;
             $question_name = Models\level::find($level_id)->name;
-            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
             //executing the code
-            $output = shell_exec($full_path."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
+            $output = shell_exec($full_path . "answers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
             $sts = false;
             $output_array = explode("\n", $output);
             //check the result of execution, if execution has failed or not
             if ($output_array[0] == 'FAIL') {
+
                 $msg = "[[;#FF0000;]$output_array[1]]";
-            }
-            else {
+
+            } else {
+
                 //successfull execution, no. of test cases satisfied
                 if ($output_array[1] == '1111111111') {
+
                     $msg = "All test cases passed";
                     $sts = true;
-                }
-                else {
+
+                } else {
+
                     $msg = "\n";
+
                     //customizing color for each test case depending on pass/fail
-                    for ($i = 1; $i <= 10; $i++ ) {
-                        if ($output_array[1][$i-1] == 0) {
-                            $msg = $msg."[[;#FF0000;]Test $i failed]\n";
-                        }
-                        else {
-                            $msg = $msg."Test $i passed\n";
+                    for ($i = 1; $i <= 10; $i++) {
+                        if ($output_array[1][$i - 1] == 0) {
+                            $msg = $msg . "[[;#FF0000;]Test $i failed]\n";
+                        } else {
+                            $msg = $msg . "Test $i passed\n";
                         }
                     }
                 }
             }
+        } else {
+
+            $sts = false;
+            $msg = "./$args[0]: Permission denied";
 
         }
+
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
@@ -478,40 +486,50 @@ class ShellContoller extends Controller
      * @param $settings
      * @return JsonResponse
      */
-    public function logout($args, $settings){
+    public function logout($args, $settings)
+    {
         if ($args[0] === false) {
+
             Auth::logout();
             Session::flush();
             return response()->json(['MSG' => 'logged out', 'STS' => true]);
+
         }
+
         return response()->json(['MSG' => 'invalid argument', 'STS' => false]);
     }
 
 
-    public function  edit($args, $settings){
-
+    public function  edit($args, $settings)
+    {
         $msg = 'No Such File';
         $sts = false;
         $file = false;
 
         if ( $args[0] !== false && !isset($args[1])) {
+
             if (strpos($args[0], 'solution') !== false) {
+
                 //calculating present directory
                 $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
                 if (Session::get('pwd') !== '~') {
                     $user_dir = $user_dir . Session::get('pwd') . '/';
                 }
+
                 $user_dir = "$user_dir$args[0]";
                 if (Storage::has($user_dir)) {
+
                     $msg = Storage::get($user_dir);
                     $file = $user_dir;
                     $sts = true;
+
                 }
-            }
-            else {
+            } else {
+
                 $msg = 'File not editable';
                 $sts = false;
                 $file = '';
+
             }
             //$msg = $user_dir;
         }
