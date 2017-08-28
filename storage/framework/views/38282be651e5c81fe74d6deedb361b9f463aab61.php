@@ -7,76 +7,68 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-
-    <title><?php echo e(config('app.name', 'Laravel')); ?></title>
-
+    <title>Castle</title>
     <!-- Styles -->
-    <link href="<?php echo e(asset('css/app.css')); ?>" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+
+    <?php $__env->startSection('css'); ?>
+    <?php echo $__env->yieldSection(); ?>
+
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+    <?php $__env->startSection('topscript'); ?>
+    <?php echo $__env->yieldSection(); ?>
+
 </head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
+        <nav class="navbar">
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+            <!-- Branding Image -->
+            <a class="navbar-brand" href="<?php echo e(url('/')); ?>">
+                <?php echo e(config('app.name', 'Laravel')); ?>
 
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="<?php echo e(url('/')); ?>">
-                        <?php echo e(config('app.name', 'Laravel')); ?>
+            </a>
 
-                    </a>
-                </div>
 
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
+            <!-- Right Side Of Navbar -->
+            <!-- Authentication Links -->
+                <?php if(Auth::guest()): ?>
+                    <ul id="nav-mobile" class="right hide-on-med-and-down">
+                        <li><a href="<?php echo e(route('login')); ?>">Login</a></li>
+                        <li><a href="<?php echo e(route('register')); ?>">Register</a></li>
                     </ul>
+                <?php else: ?>
+                    <a class='dropdown-button btn' href='#' data-activates='dropdown1'><?php echo e(Auth::user()->name); ?></a>
+                    <ul id='dropdown1' class='dropdown-content right'>
+                        <li><a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault();
+                          document.getElementById('logout-form').submit();"></a></li>
+                        <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                            <?php echo e(csrf_field()); ?>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        <?php if(Auth::guest()): ?>
-                            <li><a href="<?php echo e(route('login')); ?>">Login</a></li>
-                            <li><a href="<?php echo e(route('register')); ?>">Register</a></li>
-                        <?php else: ?>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    <?php echo e(Auth::user()->name); ?> <span class="caret"></span>
-                                </a>
-
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="<?php echo e(route('logout')); ?>"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
-
-                                        <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
-                                            <?php echo e(csrf_field()); ?>
-
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        <?php endif; ?>
+                        </form>
                     </ul>
-                </div>
-            </div>
+                <?php endif; ?>
         </nav>
-
+        <!--Content-->
         <?php echo $__env->yieldContent('content'); ?>
+
     </div>
 
     <!-- Scripts -->
-    <script src="<?php echo e(asset('js/app.js')); ?>"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-96528618-3', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+        <?php $__env->startSection('bottomscript'); ?>
+        <?php echo $__env->yieldSection(); ?>
 </body>
 </html>
