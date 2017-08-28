@@ -226,7 +226,7 @@ class ShellContoller extends Controller
         } else {
 
             $msg = "ls: $args[0]: No such directory";
-            
+
         }
 
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
@@ -240,59 +240,56 @@ class ShellContoller extends Controller
      */
     public function request($args, $settings)
     {
-        if ($args[0] === false) {
-            $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
+        $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
 
-            //check if any directories are already present
-            if (sizeof($list) > 0) {
+        //check if any directories are already present
+        if (sizeof($list) > 0) {
 
-                $sts = true;
-                $msg = "You can request a new challenge only after completing the current challenge. \n";
+            $sts = true;
+            $msg = "You can request a new challenge only after completing the current challenge. \n";
 
-            } else {
+        } else {
 
-                $user_level = $this->getLevelData();
+            $user_level = $this->getLevelData();
 
-                //Check the current status of user and increment it unless game is over
-                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
+            //Check the current status of user and increment it unless game is over
+            if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
-                    $msg = 'No more challenges. You did it.';
-                    return response()->json([ 'STS' => true, 'MSG' => $msg]);
+                $msg = 'No more challenges. You did it.';
+                return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
-                }
-                elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
-
-                    $user_level['sublevel'] = 1;
-                    $user_level['level']++;
-
-                }
-                else {
-
-                    $user_level['sublevel']++;
-
-                }
-                $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
-                $question_name = $new_level->name;
-                $question_id = $new_level->id;
-                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-                //copy question to user directory -- will not work with $settings['WORK_DIR']
-                shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
-                //create solution.py file
-                shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
-                //update user table with new level id
-                $user = Models\user::find(Auth::id());
-                $user->level_id = $question_id;
-                $user->save();
-                //add code to start new countdown
-
-                $sts = true;
-                $msg = 'New challenge added.';
             }
+            elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
+
+                $user_level['sublevel'] = 1;
+                $user_level['level']++;
+
+            }
+            else {
+
+                $user_level['sublevel']++;
+
+            }
+
+            $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
+            $question_name = $new_level->name;
+            $question_id = $new_level->id;
+            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            //copy question to user directory -- will not work with $settings['WORK_DIR']
+            shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
+            //create solution.py file
+            shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
+            //update user table with new level id
+            $user = Models\user::find(Auth::id());
+            $user->level_id = $question_id;
+            $user->save();
+            //add code to start new countdown
+
+            $sts = true;
+            $msg = 'New challenge added.';
+
         }
-        else {
-            $sts = false;
-            $msg = 'request: too many arguments';
-        }
+        
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
