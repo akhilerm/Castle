@@ -15,7 +15,7 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
     <link href="<?php echo e(asset('css/style.css')); ?>" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="js/jquery.terminal-1.5.3.js"></script>
     <link href="css/jquery.terminal-1.5.3.css" rel="stylesheet"/>
 

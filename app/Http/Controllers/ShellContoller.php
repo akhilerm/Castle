@@ -20,22 +20,26 @@ class ShellContoller extends Controller
         if (Request::ajax()){
 
             $req = Request::all();
-            if (!isset($req['args'])){
-                $req['args'] = [false];
-            }
+
             $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
-            //check if func exist and call
-            if (method_exists($this, $req['method'])){
+            if (!isset($req['method'])) {
+                $msg = '';
+            }
+            elseif (!method_exists($this, $req['method'])) {
+                $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
+            }
+            elseif ($this->check($req)) {
+                if (!isset($req['args'])){
+                    $req['args'] = [false];
+                }
                 return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
             }
+            else {
+                $msg = $req['method'].": invalid no. of parameters";
+            }
 
-            // The response. check if no command was passed or invalid command
-            if (!isset($req['method']))
-                $msg = '';
-            else
-                $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
-            return response()->json(['MSG' => $msg]);
+            return response()->json(['STS' => false, 'MSG' => $msg]);
         }
     }
 
@@ -135,10 +139,7 @@ class ShellContoller extends Controller
      */
     public function help($args, $settings)
     {
-        if ($this->check("help", $args))
-            $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
-        else
-            $msg = "help: too many arguments";
+        $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]help]   - display this message \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
         return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
     }
@@ -314,7 +315,7 @@ class ShellContoller extends Controller
      */
     public function submit($args, $settings)
     {
-        if ($args[0] ==  false) {
+        if ($args[0] !==  false) {
             $output = $this->verify($args, $settings);
             $output = json_decode($output->content(), true);
             //check if verification was successful
@@ -400,18 +401,34 @@ class ShellContoller extends Controller
 
     /**
      * CHECK ARGUMENTS: validate arguments passed for a command
-     * @param $command
-     * @param $args
+     * @param $req  request object
      * @return boolean true if correct number of arguments for the command else false
      */
-    function check($command, $args)
+    function check($req)
     {
-        //write code to check each command and its function.
-        switch ($command) {
+        //write code to check each command and its arguments.
+        switch ($req['method']) {
             case "help":
-                return true;
+            case "logout":
+            case "request":
+            case "status":
+                if (!isset($req['args']))
+                    return true;
+                break;
+            case "ls":
+            case "cd":
+                if (!isset($req['args']) || sizeof($req['args']) <= 1)
+                    return true;
+                break;
+            case "cat":
+            case "verify":
+            case "submit":
+            case "edit":
+                if (isset($req['args']) && sizeof($req['args']) == 1)
+                    return true;
+                break;
         }
-
+        return false;
     }
 
     /**
