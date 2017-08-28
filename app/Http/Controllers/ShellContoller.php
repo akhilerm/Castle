@@ -82,7 +82,11 @@ class ShellContoller extends Controller
         } elseif ($args[0] === '.') {
 
             //Keeping it in the same directory
-            $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+            $msg = Auth::user()['name'] . '@Castle:~';
+
+            //constructing the prompt depending on directory
+            if (Session::get('pwd') !== '~')
+                $msg = $msg . "/" . session('pwd') . '$ ';
             $sts = true;
 
         } else {
@@ -97,7 +101,7 @@ class ShellContoller extends Controller
                 if (Storage::has("$user_dir/")) {
 
                     Session::put('pwd', $args[0]);
-                    $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
                     $sts = true;
                     return response()->json(['STS' => $sts, 'MSG' => $msg]);
 
@@ -147,7 +151,7 @@ class ShellContoller extends Controller
             $msg = "cat: $args[0]: No such file";
 
         }
-        
+
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
 
     }
@@ -161,6 +165,7 @@ class ShellContoller extends Controller
      */
     public function help($args, $settings)
     {
+
         $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]help]   - display this message \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
         return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
@@ -173,19 +178,29 @@ class ShellContoller extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-    public function ls($args,$settings) {
+    public function ls($args,$settings)
+    {
 
         //calculating present directory
         $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
-        if (Session::get('pwd') !== '~' ){
+
+        if (Session::get('pwd') !== '~' ) {
+
             $user_dir = $user_dir.Session::get('pwd').'/';
+
         }
-        if ( $args[0] !== false){
+
+        //modify the path on which ls should operate depending on whether a dir has been passed as arg.
+        if ($args[0] !== false){
+
             $user_dir = "$user_dir$args[0]/";
+
         }
+
         $msg ='';
         $user_dir = strtr($user_dir, ['//' => '/']);
-        if (Storage::has($user_dir)){
+        if (Storage::has($user_dir)) {
+
             $files = Storage::files($user_dir);
             $dirs = Storage::directories($user_dir);
 
@@ -197,15 +212,21 @@ class ShellContoller extends Controller
 
             //Fixing Format
             $count = 0;
-            foreach ($all_files as $file){
+            foreach ($all_files as $file) {
+
                 if ($count !== 0){
                     $msg  = "$msg\n";
                 }
                 $file = strtr($file, [$user_dir => '']);
                 $msg = "$msg$file";
                 $count++;
+
             }
 
+        } else {
+
+            $msg = "ls: $args[0]: No such directory";
+            
         }
 
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
