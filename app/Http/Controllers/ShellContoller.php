@@ -17,29 +17,47 @@ class ShellContoller extends Controller
 
     public function shell()
     {
-        if (Request::ajax()){
+        if (Request::ajax()) {
 
             $req = Request::all();
 
             $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
+            //whether anything was typed in the terminal
             if (!isset($req['method'])) {
+
                 $msg = '';
+
             }
+
+            //method exists or not
             elseif (!method_exists($this, $req['method'])) {
+
                 $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
+
             }
+
+            //validate the no. of parameters passes to  the method
             elseif ($this->check($req)) {
-                if (!isset($req['args'])){
+
+                if (!isset($req['args'])) {
+
                     $req['args'] = [false];
+
                 }
+
                 return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
+
             }
+
             else {
-                $msg = $req['method'].": invalid no. of parameters";
+
+                $msg = $req['method'].": Invalid no. of parameters";
+
             }
 
             return response()->json(['STS' => false, 'MSG' => $msg]);
+
         }
     }
 
@@ -54,45 +72,41 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($args[0] !== false ) {
-            if ($args[0] === '..' || $args[0] === '~') {
+        if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
 
-                Session::put('pwd', '~');
-                $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
-                $sts = true;
+            //move to home directory
+            Session::put('pwd', '~');
+            $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
+            $sts = true;
 
-            } elseif ($args[0] !== '.') {
+        } elseif ($args[0] === '.') {
 
-                //ADDRESS TO  Users home directory
-                $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+            //Keeping it in the same directory
+            $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+            $sts = true;
 
-                //Check if the folder exists if in home
-                if (Session::get('pwd') === '~') {
-                    $user_dir = "$user_dir/$args[0]";
-                    if (Storage::has("$user_dir/")) {
-                        Session::put('pwd', $args[0]);
-                        $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
-                        $sts = true;
-                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
-                    }
+        } else {
+
+            //ADDRESS TO  Users home directory
+            $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+
+            //Check if the folder exists if in home
+            if (Session::get('pwd') === '~') {
+
+                $user_dir = "$user_dir/$args[0]";
+                if (Storage::has("$user_dir/")) {
+
+                    Session::put('pwd', $args[0]);
+                    $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+                    $sts = true;
+                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
+
                 }
-
-                //No Directory
-                $msg = "cd: $args[0]: No such directory";
-                $sts = false;
-
-            } else {
-
-                //Keeping it in the same directory
-                $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
-                $sts = true;
-
             }
-        } else{
 
+            //No Directory by that name
+            $msg = "cd: $args[0]: No such directory";
             $sts = false;
-            $msg = "No Directory";
-
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
@@ -106,26 +120,34 @@ class ShellContoller extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-    public function cat($args, $settings) {
+    public function cat($args, $settings)
+    {
+        //calculating present directory
+        $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
 
-        $msg = 'No Such file';
-        if ($args[0] !== false) {
-            //calculating present directory
-            $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
-            if (Session::get('pwd') !== '~') {
-                $user_dir = $user_dir . Session::get('pwd') . '/';
-            }
-            $user_dir = "$user_dir$args[0]";
+        if (Session::get('pwd') !== '~') {
 
-            //Check IF file exist and get content
-            if (Storage::has($user_dir)) {
-                $msg = Storage::get($user_dir);
+            $user_dir = $user_dir . Session::get('pwd') . '/';
 
-                //check if the file is a directory
-                if ($msg == '')
-                    $msg = "cat: $args[0]: is a directory";
-            }
         }
+
+        $user_dir = "$user_dir$args[0]";
+
+        //Check IF file exist and get content
+        if (Storage::has($user_dir)) {
+
+            $msg = Storage::get($user_dir);
+
+            //check if the file is a directory
+            if ($msg == '')
+                $msg = "cat: $args[0]: Is a directory";
+
+        } else {
+
+            $msg = "cat: $args[0]: No such file";
+
+        }
+        
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
 
     }
