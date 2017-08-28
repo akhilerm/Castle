@@ -17,25 +17,47 @@ class ShellContoller extends Controller
 
     public function shell()
     {
-        if (Request::ajax()){
+        if (Request::ajax()) {
 
             $req = Request::all();
-            if (!isset($req['args'])){
-                $req['args'] = [false];
-            }
+
             $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
-            //check if func exist and call
-            if (method_exists($this, $req['method'])){
-                return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
+            //whether anything was typed in the terminal
+            if (!isset($req['method'])) {
+
+                $msg = '';
+
             }
 
-            // The response. check if no command was passed or invalid command
-            if (!isset($req['method']))
-                $msg = '';
-            else
+            //method exists or not
+            elseif (!method_exists($this, $req['method'])) {
+
                 $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
-            return response()->json(['MSG' => $msg]);
+
+            }
+
+            //validate the no. of parameters passes to  the method
+            elseif ($this->check($req)) {
+
+                if (!isset($req['args'])) {
+
+                    $req['args'] = [false];
+
+                }
+
+                return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
+
+            }
+
+            else {
+
+                $msg = $req['method'].": Invalid no. of parameters";
+
+            }
+
+            return response()->json(['STS' => false, 'MSG' => $msg]);
+
         }
     }
 
@@ -50,45 +72,45 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($args[0] !== false ) {
-            if ($args[0] === '..' || $args[0] === '~') {
+        if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
 
-                Session::put('pwd', '~');
-                $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
-                $sts = true;
+            //move to home directory
+            Session::put('pwd', '~');
+            $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
+            $sts = true;
 
-            } elseif ($args[0] !== '.') {
+        } elseif ($args[0] === '.') {
 
-                //ADDRESS TO  Users home directory
-                $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+            //Keeping it in the same directory
+            $msg = Auth::user()['name'] . '@Castle:~';
 
-                //Check if the folder exists if in home
-                if (Session::get('pwd') === '~') {
-                    $user_dir = "$user_dir/$args[0]";
-                    if (Storage::has("$user_dir/")) {
-                        Session::put('pwd', $args[0]);
-                        $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
-                        $sts = true;
-                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
-                    }
+            //constructing the prompt depending on directory
+            if (Session::get('pwd') !== '~')
+                $msg = $msg . "/" . session('pwd') . '$ ';
+            $sts = true;
+
+        } else {
+
+            //ADDRESS TO  Users home directory
+            $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+
+            //Check if the folder exists if in home
+            if (Session::get('pwd') === '~') {
+
+                $user_dir = "$user_dir/$args[0]";
+                if (Storage::has("$user_dir/")) {
+
+                    Session::put('pwd', $args[0]);
+                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                    $sts = true;
+                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
+
                 }
-
-                //No Directory
-                $msg = "cd: $args[0]: No such directory";
-                $sts = false;
-
-            } else {
-
-                //Keeping it in the same directory
-                $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
-                $sts = true;
-
             }
-        } else{
 
+            //No Directory by that name
+            $msg = "cd: $args[0]: No such directory";
             $sts = false;
-            $msg = "No Directory";
-
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
@@ -102,26 +124,34 @@ class ShellContoller extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-    public function cat($args, $settings) {
+    public function cat($args, $settings)
+    {
+        //calculating present directory
+        $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
 
-        $msg = 'No Such file';
-        if ($args[0] !== false) {
-            //calculating present directory
-            $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
-            if (Session::get('pwd') !== '~') {
-                $user_dir = $user_dir . Session::get('pwd') . '/';
-            }
-            $user_dir = "$user_dir$args[0]";
+        if (Session::get('pwd') !== '~') {
 
-            //Check IF file exist and get content
-            if (Storage::has($user_dir)) {
-                $msg = Storage::get($user_dir);
+            $user_dir = $user_dir . Session::get('pwd') . '/';
 
-                //check if the file is a directory
-                if ($msg == '')
-                    $msg = "cat: $args[0]: is a directory";
-            }
         }
+
+        $user_dir = "$user_dir$args[0]";
+
+        //Check IF file exist and get content
+        if (Storage::has($user_dir)) {
+
+            $msg = Storage::get($user_dir);
+
+            //check if the file is a directory
+            if ($msg == '')
+                $msg = "cat: $args[0]: Is a directory";
+
+        } else {
+
+            $msg = "cat: $args[0]: No such file";
+
+        }
+
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
 
     }
@@ -135,10 +165,8 @@ class ShellContoller extends Controller
      */
     public function help($args, $settings)
     {
-        if ($this->check("help", $args))
-            $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
-        else
-            $msg = "help: too many arguments";
+
+        $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]help]   - display this message \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n";
         return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
     }
@@ -150,19 +178,29 @@ class ShellContoller extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-    public function ls($args,$settings) {
+    public function ls($args,$settings)
+    {
 
         //calculating present directory
         $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
-        if (Session::get('pwd') !== '~' ){
+
+        if (Session::get('pwd') !== '~' ) {
+
             $user_dir = $user_dir.Session::get('pwd').'/';
+
         }
-        if ( $args[0] !== false){
+
+        //modify the path on which ls should operate depending on whether a dir has been passed as arg.
+        if ($args[0] !== false){
+
             $user_dir = "$user_dir$args[0]/";
+
         }
+
         $msg ='';
         $user_dir = strtr($user_dir, ['//' => '/']);
-        if (Storage::has($user_dir)){
+        if (Storage::has($user_dir)) {
+
             $files = Storage::files($user_dir);
             $dirs = Storage::directories($user_dir);
 
@@ -174,14 +212,20 @@ class ShellContoller extends Controller
 
             //Fixing Format
             $count = 0;
-            foreach ($all_files as $file){
+            foreach ($all_files as $file) {
+
                 if ($count !== 0){
                     $msg  = "$msg\n";
                 }
                 $file = strtr($file, [$user_dir => '']);
                 $msg = "$msg$file";
                 $count++;
+
             }
+
+        } else {
+
+            $msg = "ls: $args[0]: No such directory";
 
         }
 
@@ -196,59 +240,56 @@ class ShellContoller extends Controller
      */
     public function request($args, $settings)
     {
-        if ($args[0] === false) {
-            $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
+        $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
 
-            //check if any directories are already present
-            if (sizeof($list) > 0) {
+        //check if any directories are already present
+        if (sizeof($list) > 0) {
 
-                $sts = true;
-                $msg = "You can request a new challenge only after completing the current challenge. \n";
+            $sts = true;
+            $msg = "You can request a new challenge only after completing the current challenge. \n";
 
-            } else {
+        } else {
 
-                $user_level = $this->getLevelData();
+            $user_level = $this->getLevelData();
 
-                //Check the current status of user and increment it unless game is over
-                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
+            //Check the current status of user and increment it unless game is over
+            if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
-                    $msg = 'No more challenges. You did it.';
-                    return response()->json([ 'STS' => true, 'MSG' => $msg]);
+                $msg = 'No more challenges. You did it.';
+                return response()->json([ 'STS' => true, 'MSG' => $msg]);
 
-                }
-                elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
-
-                    $user_level['sublevel'] = 1;
-                    $user_level['level']++;
-
-                }
-                else {
-
-                    $user_level['sublevel']++;
-
-                }
-                $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
-                $question_name = $new_level->name;
-                $question_id = $new_level->id;
-                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-                //copy question to user directory -- will not work with $settings['WORK_DIR']
-                shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
-                //create solution.py file
-                shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
-                //update user table with new level id
-                $user = Models\user::find(Auth::id());
-                $user->level_id = $question_id;
-                $user->save();
-                //add code to start new countdown
-
-                $sts = true;
-                $msg = 'New challenge added.';
             }
+            elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
+
+                $user_level['sublevel'] = 1;
+                $user_level['level']++;
+
+            }
+            else {
+
+                $user_level['sublevel']++;
+
+            }
+
+            $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
+            $question_name = $new_level->name;
+            $question_id = $new_level->id;
+            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            //copy question to user directory -- will not work with $settings['WORK_DIR']
+            shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
+            //create solution.py file
+            shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
+            //update user table with new level id
+            $user = Models\user::find(Auth::id());
+            $user->level_id = $question_id;
+            $user->save();
+            //add code to start new countdown
+
+            $sts = true;
+            $msg = 'New challenge added.';
+
         }
-        else {
-            $sts = false;
-            $msg = 'request: too many arguments';
-        }
+
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
@@ -260,47 +301,41 @@ class ShellContoller extends Controller
      */
     public function status($args, $settings)
     {
-        if ($args[0] === false) {
-            $user_level = $this->getLevelData();
+        $user_level = $this->getLevelData();
 
-            $sts = true;
-            $msg = "\n";
+        $sts = true;
+        $msg = "\n";
 
-            /*//Testing purpose
-                $user_level['level']=5;
-                $user_level['max_level']=8;
-                $user_level['max_sublevel']=8;
-                $user_level['sublevel']=5;*/
+        /*//Testing purpose
+            $user_level['level']=5;
+            $user_level['max_level']=8;
+            $user_level['max_sublevel']=8;
+            $user_level['sublevel']=5;*/
 
 
-            //for completed levels
-            for ($i = 1; $i < $user_level['level']; $i++) {
-                $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
-                $msg = "$msg\n";
-            }
-
-            //for partially completed levels
-            $flag = true;
-            $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
-            for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
-                $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
-                for ($j = 1; $j <= 20; $j++) {
-
-                    if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
-                        $flag=false;
-
-                    if ($flag) {
-                        $msg = $msg."=";
-                    }
-                    else
-                        $msg = $msg.".";
-                }
-                $msg = $msg."]\n";
-            }
+        //for completed levels
+        for ($i = 1; $i < $user_level['level']; $i++) {
+            $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
+            $msg = "$msg\n";
         }
-        else {
-            $sts = false;
-            $msg = 'status: too many arguments';
+
+        //for partially completed levels
+        $flag = true;
+        $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
+        for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
+            $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
+            for ($j = 1; $j <= 20; $j++) {
+
+                if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
+                    $flag=false;
+
+                if ($flag) {
+                    $msg = $msg."=";
+                }
+                else
+                    $msg = $msg.".";
+            }
+            $msg = $msg."]\n";
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
@@ -314,27 +349,31 @@ class ShellContoller extends Controller
      */
     public function submit($args, $settings)
     {
-        if ($args[0] ==  false) {
-            $output = $this->verify($args, $settings);
-            $output = json_decode($output->content(), true);
-            //check if verification was successful
-            if ($output['STS'] == true) {
-                $sts = true;
-                $msg = 'Solution submitted successfully';
-                $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-                $level_id = Models\user::find(Auth::id())->first()->level_id;
-                $question_name = Models\level::find($level_id)->name;
-                //remove questionfolder
-                shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
-                //change pwd
-                Session::put('pwd', '~');
-                //add code for removing countdown
-            }
-            else {
-                $sts = false;
-                $msg = 'Solution can be submitted only after successful verification';
-            }
+        $output = $this->verify($args, $settings);
+        $output = json_decode($output->content(), true);
+
+        //check if verification was successful
+        if ($output['STS'] == true) {
+
+            $sts = true;
+            $msg = 'Solution submitted successfully';
+            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            $level_id = Models\user::find(Auth::id())->first()->level_id;
+            $question_name = Models\level::find($level_id)->name;
+            //remove question folder
+            shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
+            //change pwd
+            Session::put('pwd', '~');
+            //add code for removing countdown
+
         }
+        else {
+
+            $sts = false;
+            $msg = 'Solution can be submitted only after successful verification';
+
+        }
+
         return response()->json(['STS' => true, 'MSG' => $msg]);
     }
 
@@ -346,39 +385,49 @@ class ShellContoller extends Controller
      */
     public function verify($args, $settings)
     {
-        if ($args[0] === false) {
+        if (strpos($args[0], 'solution') !== false) {
+
             $level_id = Models\user::find(Auth::id())->first()->level_id;
             $question_name = Models\level::find($level_id)->name;
-            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
             //executing the code
-            $output = shell_exec($full_path."answers/verify.sh "."solution.py ".$question_name." ".$full_path." ".Auth::id());
+            $output = shell_exec($full_path . "answers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
             $sts = false;
             $output_array = explode("\n", $output);
             //check the result of execution, if execution has failed or not
             if ($output_array[0] == 'FAIL') {
+
                 $msg = "[[;#FF0000;]$output_array[1]]";
-            }
-            else {
+
+            } else {
+
                 //successfull execution, no. of test cases satisfied
                 if ($output_array[1] == '1111111111') {
+
                     $msg = "All test cases passed";
                     $sts = true;
-                }
-                else {
+
+                } else {
+
                     $msg = "\n";
+
                     //customizing color for each test case depending on pass/fail
-                    for ($i = 1; $i <= 10; $i++ ) {
-                        if ($output_array[1][$i-1] == 0) {
-                            $msg = $msg."[[;#FF0000;]Test $i failed]\n";
-                        }
-                        else {
-                            $msg = $msg."Test $i passed\n";
+                    for ($i = 1; $i <= 10; $i++) {
+                        if ($output_array[1][$i - 1] == 0) {
+                            $msg = $msg . "[[;#FF0000;]Test $i failed]\n";
+                        } else {
+                            $msg = $msg . "Test $i passed\n";
                         }
                     }
                 }
             }
+        } else {
+
+            $sts = false;
+            $msg = "./$args[0]: Permission denied";
 
         }
+
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
@@ -400,18 +449,34 @@ class ShellContoller extends Controller
 
     /**
      * CHECK ARGUMENTS: validate arguments passed for a command
-     * @param $command
-     * @param $args
+     * @param $req  request object
      * @return boolean true if correct number of arguments for the command else false
      */
-    function check($command, $args)
+    function check($req)
     {
-        //write code to check each command and its function.
-        switch ($command) {
+        //write code to check each command and its arguments.
+        switch ($req['method']) {
             case "help":
-                return true;
+            case "logout":
+            case "request":
+            case "status":
+                if (!isset($req['args']))
+                    return true;
+                break;
+            case "ls":
+            case "cd":
+                if (!isset($req['args']) || sizeof($req['args']) <= 1)
+                    return true;
+                break;
+            case "cat":
+            case "verify":
+            case "submit":
+            case "edit":
+                if (isset($req['args']) && sizeof($req['args']) == 1)
+                    return true;
+                break;
         }
-
+        return false;
     }
 
     /**
@@ -421,33 +486,50 @@ class ShellContoller extends Controller
      * @param $settings
      * @return JsonResponse
      */
-    public function logout($args, $settings){
+    public function logout($args, $settings)
+    {
         if ($args[0] === false) {
+
             Auth::logout();
             Session::flush();
             return response()->json(['MSG' => 'logged out', 'STS' => true]);
+
         }
+
         return response()->json(['MSG' => 'invalid argument', 'STS' => false]);
     }
 
 
-    public function  edit($args, $settings){
-
+    public function  edit($args, $settings)
+    {
         $msg = 'No Such File';
         $sts = false;
         $file = false;
 
         if ( $args[0] !== false && !isset($args[1])) {
-            //calculating present directory
-            $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
-            if (Session::get('pwd') !== '~') {
-                $user_dir = $user_dir . Session::get('pwd') . '/';
-            }
-            $user_dir = "$user_dir$args[0]";
-            if (Storage::has($user_dir)) {
-                $msg = Storage::get($user_dir);
-                $file = $user_dir;
-                $sts = true;
+
+            if (strpos($args[0], 'solution') !== false) {
+
+                //calculating present directory
+                $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
+                if (Session::get('pwd') !== '~') {
+                    $user_dir = $user_dir . Session::get('pwd') . '/';
+                }
+
+                $user_dir = "$user_dir$args[0]";
+                if (Storage::has($user_dir)) {
+
+                    $msg = Storage::get($user_dir);
+                    $file = $user_dir;
+                    $sts = true;
+
+                }
+            } else {
+
+                $msg = 'File not editable';
+                $sts = false;
+                $file = '';
+
             }
             //$msg = $user_dir;
         }
