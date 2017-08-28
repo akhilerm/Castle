@@ -22,3 +22,11 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::post('/shell','ShellContoller@shell')->name('shell');
 
 Route::post('/editor', 'EditorController@index')->name('editor');
+
+/**
+ * Route just for test
+ */
+
+Route::get('/test',function (){
+    return storage_path();
+});
