@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->integer('active')->default(0);
             $table->boolean('role')->default(0);
             $table->integer('level_id')->default(0);
+            $table->enum('status',['timed out', 'playing', 'completed']);
             $table->rememberToken();
             $table->timestamps();
         });
