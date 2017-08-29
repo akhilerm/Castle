@@ -283,6 +283,7 @@ class ShellContoller extends Controller
             //update user table with new level id
             $user = Models\user::find(Auth::id());
             $user->level_id = $question_id;
+            $user->status = 'PLAYING';
             $user->save();
             //add code to start new countdown
 
@@ -365,12 +366,15 @@ class ShellContoller extends Controller
             $sts = true;
             $msg = 'Solution submitted successfully';
             $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-            $level_id = Models\user::find(Auth::id())->first()->level_id;
+            $user = Models\user::find(Auth::id())->first();
+            $level_id = $user->level_id;
             $question_name = Models\level::find($level_id)->name;
             //remove question folder
             shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
             //change pwd
             Session::put('pwd', '~');
+            $user->status = 'COMPLETED';
+            $user->save();
             //add code for removing countdown
 
         }
