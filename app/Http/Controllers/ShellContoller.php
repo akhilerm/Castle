@@ -385,7 +385,7 @@ class ShellContoller extends Controller
 
         }
 
-        return response()->json(['STS' => true, 'MSG' => $msg]);
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
     /**
