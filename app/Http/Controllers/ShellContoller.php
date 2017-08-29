@@ -386,47 +386,61 @@ class ShellContoller extends Controller
      */
     public function verify($args, $settings)
     {
-        if (strpos($args[0], 'solution') !== false) {
+        //calculating present directory
+        $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
+        if (Session::get('pwd') !== '~') {
+            $user_dir = $user_dir . Session::get('pwd') . '/';
+        }
 
-            $level_id = Models\user::find(Auth::id())->first()->level_id;
-            $question_name = Models\level::find($level_id)->name;
-            $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
-            //executing the code
-            $output = shell_exec($full_path . "answers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
-            $sts = false;
-            $output_array = explode("\n", $output);
-            //check the result of execution, if execution has failed or not
-            if ($output_array[0] == 'FAIL') {
+        $user_dir = "$user_dir$args[0]";
+        if (Storage::has($user_dir)) {
+            if (strpos($args[0], 'solution') !== false) {
 
-                $msg = "[[;#FF0000;]$output_array[1]]";
+                $level_id = Models\user::find(Auth::id())->first()->level_id;
+                $question_name = Models\level::find($level_id)->name;
+                $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
+                //executing the code
+                $output = shell_exec($full_path . "answers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
+                $sts = false;
+                $output_array = explode("\n", $output);
+                //check the result of execution, if execution has failed or not
+                if ($output_array[0] == 'FAIL') {
 
-            } else {
-
-                //successfull execution, no. of test cases satisfied
-                if ($output_array[1] == '1111111111') {
-
-                    $msg = "All test cases passed";
-                    $sts = true;
+                    $msg = "[[;#FF0000;]$output_array[1]]";
 
                 } else {
 
-                    $msg = "\n";
+                    //successfull execution, no. of test cases satisfied
+                    if ($output_array[1] == '1111111111') {
 
-                    //customizing color for each test case depending on pass/fail
-                    for ($i = 1; $i <= 10; $i++) {
-                        if ($output_array[1][$i - 1] == 0) {
-                            $msg = $msg . "[[;#FF0000;]Test $i failed]\n";
-                        } else {
-                            $msg = $msg . "Test $i passed\n";
+                        $msg = "All test cases passed";
+                        $sts = true;
+
+                    } else {
+
+                        $msg = "\n";
+
+                        //customizing color for each test case depending on pass/fail
+                        for ($i = 1; $i <= 10; $i++) {
+                            if ($output_array[1][$i - 1] == 0) {
+                                $msg = $msg . "[[;#FF0000;]Test $i failed]\n";
+                            } else {
+                                $msg = $msg . "Test $i passed\n";
+                            }
                         }
                     }
                 }
+            } else {
+
+                $sts = false;
+                $msg = "./$args[0]: Permission denied";
+
             }
         } else {
 
             $sts = false;
-            $msg = "./$args[0]: Permission denied";
-
+            $msg = "verify: $args[0]: No such file";
+            
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
