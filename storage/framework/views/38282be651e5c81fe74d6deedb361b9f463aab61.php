@@ -39,16 +39,6 @@
                         <li><a href="<?php echo e(route('login')); ?>">Login</a></li>
                         <li><a href="<?php echo e(route('register')); ?>">Register</a></li>
                     </ul>
-                <?php else: ?>
-                    <a class='dropdown-button btn' href='#' data-activates='dropdown1'><?php echo e(Auth::user()->name); ?></a>
-                    <ul id='dropdown1' class='dropdown-content right'>
-                        <li><a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault();
-                          document.getElementById('logout-form').submit();"></a></li>
-                        <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
-                            <?php echo e(csrf_field()); ?>
-
-                        </form>
-                    </ul>
                 <?php endif; ?>
         </nav>
         <!--Content-->

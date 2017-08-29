@@ -308,35 +308,41 @@ class ShellContoller extends Controller
         $msg = "\n";
 
         /*//Testing purpose
-            $user_level['level']=5;
-            $user_level['max_level']=8;
-            $user_level['max_sublevel']=8;
-            $user_level['sublevel']=5;*/
-
+            $user_level['status']='COMPLETED';
+            $user_level['level']=1;
+            $user_level['max_level']=5;
+            $user_level['max_sublevel']=2;
+            $user_level['sublevel']=1;*/
 
         //for completed levels
         for ($i = 1; $i < $user_level['level']; $i++) {
-            $msg = $msg.'[[;'.$settings['DIR_COLOR'].';]Level '.$i.' 100% [====================\]] ';
+            $msg = $msg.'[[;#00FF00;]Level '.$i.' 100% [====================\]] ';
             $msg = "$msg\n";
         }
 
-        //for partially completed levels
-        $flag = true;
-        $user_level['max_sublevel'] = ($user_level['max_sublevel'] == 0? 1: $user_level['max_sublevel']);
-        for ($i = ($user_level['level'] == 0? 1: $user_level['level']); $i <= $user_level['max_level']; $i++) {
-            $msg = $msg."Level ".$i." ".($i == $user_level['level']? round($user_level['sublevel']*100/$user_level['max_sublevel'])."%  ":"0%   ")."[";
-            for ($j = 1; $j <= 20; $j++) {
+        //for current level
+        if ($user_level['level'] != 0) {
 
-                if ($flag && $j == round($user_level['sublevel']*20/$user_level['max_sublevel']))
-                    $flag=false;
+            if ($user_level['status'] != 'COMPLETED')
+                $user_level['sublevel']--;
 
-                if ($flag) {
+            $per = round($user_level['sublevel'] * 100 / $user_level['max_sublevel']);
+            $msg = $msg."Level ".$user_level['level']." ".str_pad("$per%", 5, ' ', STR_PAD_RIGHT);
+
+            $msg = $msg."[";
+            for ($i = 1; $i <= 20; $i++) {
+                if ($i <= $per/5)
                     $msg = $msg."=";
-                }
                 else
                     $msg = $msg.".";
             }
             $msg = $msg."]\n";
+        }
+
+        //for not completed levels
+        for ($i = $user_level['level'] + 1; $i <= $user_level['max_level']; $i++) {
+            $msg = $msg."Level $i 0%   [....................]";
+            $msg = "$msg\n";
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
@@ -453,13 +459,15 @@ class ShellContoller extends Controller
      */
     function getLevelData()
     {
-        $level_id = Models\user::find(Auth::id())->first()->level_id;
+        $user = Models\user::find(Auth::id())->first();
+        $level_id = $user->level_id;
+        $status = $user->status;
         $level_data = Models\level::find($level_id);
         $level = $level_data->level;
         $sublevel = $level_data->sub_level;
         $max_level = Models\level::orderBy('level', 'DESC')->first()->level;
         $max_sublevel = Models\level::where('level', '=', $level)->orderBy('sub_level', 'DESC')->first()->sub_level;
-        return array('level' => $level, 'sublevel' => $sublevel, 'max_level' => $max_level, 'max_sublevel' => $max_sublevel);
+        return array('level' => $level, 'sublevel' => $sublevel, 'max_level' => $max_level, 'max_sublevel' => $max_sublevel, 'status' => $status);
     }
 
     /**
