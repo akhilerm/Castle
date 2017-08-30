@@ -23,8 +23,8 @@ class CreateUsersTable extends Migration
             $table->string('phone',13);
             $table->integer('active')->default(0);
             $table->boolean('role')->default(0);
-            $table->integer('level_id')->default(0);
-            $table->enum('status',['TIMEOUT', 'PLAYING', 'COMPLETED']);
+            $table->integer('level_id')->default(1);
+            $table->enum('status',['TIMEOUT', 'PLAYING', 'COMPLETED'])->default('COMPLETED');
             $table->rememberToken();
             $table->timestamps();
         });
