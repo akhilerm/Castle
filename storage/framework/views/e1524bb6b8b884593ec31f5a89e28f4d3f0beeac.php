@@ -12,7 +12,8 @@
         $(document).ready(function () {
 
             editor = $("#input");
-            $("#save").click(function () {
+
+            var saveData = function () {
                 if(fileName !== false){
                     $.post("/editor",{ '_token': $('meta[name=csrf-token]').attr('content'), value: editor.val(), file: fileName}, function (data) {
                         alert(data['MSG']);
@@ -22,15 +23,19 @@
                 } else{
                     alert("Make Sure File is open");
                 }
-            });
+            };
 
-            $("#close").click(function () {
-                    editor.val("");
-                    fileName = false;
-            });
+           var closeEditor = function () {
+                editor.val("");
+                fileName = false;
+            };
+
+            $("#save").click(saveData);
+
+            $("#close").click(closeEditor);
 
             editor.keydown(function (e) {
-                if(e.keyCode === 9) { // tab was pressed
+                if(e.keyCode === 9) {
                     var start = this.selectionStart;
                     var end = this.selectionEnd;
                     var $this = $(this);
@@ -41,6 +46,17 @@
                     this.selectionStart = this.selectionEnd = start + 1;
                     e.preventDefault();
                 }
+
+                if(e.ctrlKey && e.keyCode === 83){
+                    e.preventDefault();
+                    saveData();
+                }
+
+                if (e.ctrlKey && e.keyCode === 69){
+                    e.preventDefault();
+                    closeEditor();
+                }
+
             });
 
         });
