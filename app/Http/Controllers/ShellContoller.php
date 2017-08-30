@@ -317,7 +317,7 @@ class ShellContoller extends Controller
 
         //for completed levels
         for ($i = 1; $i < $user_level['level']; $i++) {
-            $msg = $msg.'[[;#00FF00;]Level '.$i.' 100% [====================\]] ';
+            $msg = $msg.'[[;#00e575;]Level '.$i.' 100% [====================\]] ';
             $msg = "$msg\n";
         }
 
@@ -328,16 +328,25 @@ class ShellContoller extends Controller
                 $user_level['sublevel']--;
 
             $per = round($user_level['sublevel'] * 100 / $user_level['max_sublevel']);
-            $msg = $msg."Level ".$user_level['level']." ".str_pad("$per%", 5, ' ', STR_PAD_RIGHT);
 
-            $msg = $msg."[";
+            //to apply color if 100%
+            if ($per == 100)
+                $msg = $msg.'[[;#00e575;]';
+
+            $msg = $msg.'Level '.$user_level['level'].' '.str_pad("$per%", 5, ' ', STR_PAD_RIGHT);
+
+            $msg = $msg.'[';
             for ($i = 1; $i <= 20; $i++) {
                 if ($i <= $per/5)
-                    $msg = $msg."=";
+                    $msg = $msg.'=';
                 else
-                    $msg = $msg.".";
+                    $msg = $msg.'.';
             }
-            $msg = $msg."]\n";
+
+            if ($per == 100)
+                $msg = $msg.'\]';
+            $msg = $msg.'\]';
+            $msg = "$msg\n";
         }
 
         //for not completed levels
@@ -385,7 +394,7 @@ class ShellContoller extends Controller
 
         }
 
-        return response()->json(['STS' => true, 'MSG' => $msg]);
+        return response()->json(['STS' => $sts, 'MSG' => $msg]);
     }
 
     /**
