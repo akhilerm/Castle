@@ -98,7 +98,7 @@ class ShellContoller extends Controller
             if (Session::get('pwd') === '~') {
 
                 $user_dir = "$user_dir/$args[0]";
-                if (Storage::has("$user_dir/")) {
+                if (is_dir(storage_path().'/app/'.$user_dir)) {
 
                     Session::put('pwd', $args[0]);
                     $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
@@ -194,13 +194,12 @@ class ShellContoller extends Controller
         //modify the path on which ls should operate depending on whether a dir has been passed as arg.
         if ($args[0] !== false){
 
-            $user_dir = "$user_dir$args[0]/";
+            $user_dir = "$user_dir$args[0]";
 
         }
 
         $msg ='';
-        $user_dir = strtr($user_dir, ['//' => '/']);
-        if (Storage::has($user_dir)) {
+        if (is_dir(storage_path().'/app/'.$user_dir) ) {
 
             $files = Storage::files($user_dir);
             $dirs = Storage::directories($user_dir);
