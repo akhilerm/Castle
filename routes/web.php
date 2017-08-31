@@ -28,12 +28,6 @@ Route::post('/editor', 'EditorController@index')->name('editor');
  */
 
 Route::get('/test',function (){
-    $path = '/home/oem/Projects/Castle/Castle/Castle/storage/app/public/users/1/journal.txt';
-    $my_file = fopen($path, "r");
-    $values ='';
-    while (!feof($my_file)){
-        $values .= fgets($my_file);
-    }
-    fclose($my_file);
-    return $values;
+    
+    return 'Success';
 });

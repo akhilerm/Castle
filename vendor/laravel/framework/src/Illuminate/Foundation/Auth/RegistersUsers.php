@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Storage;
 
 trait RegistersUsers
 {
@@ -32,7 +33,29 @@ trait RegistersUsers
 
         event(new Registered($user = $this->create($request->all())));
 
-        $this->guard()->login($user);
+        //$this->guard()->login($user);
+
+        //calculate path for the user if the dir already exists (unlikely) delete it and create new dir
+        $default = 'public/users/default';
+        $user_id = $user['id'];
+        $user_dir = "public/users/$user_id";
+        if (Storage::has($user_dir)){
+            Storage::deleteDirectory($user_dir);
+        }
+
+        //find all sub dirs in default and create them as well
+        $directories = Storage::allDirectories($default);
+        foreach ($directories as  $directory){
+            $formatted = strtr($directory, [  $default => $user_dir]);
+            Storage::makeDirectory($formatted);
+        }
+
+        //Find all files in default  dir and make a copy of it to main folder
+        $files = Storage::allFiles($default);
+        foreach ($files as $file){
+            $new_file = strtr($file, [ $default => $user_dir ]);
+            Storage::copy($file, $new_file);
+        }
 
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
