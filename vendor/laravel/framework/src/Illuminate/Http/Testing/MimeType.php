@@ -600,6 +600,7 @@ class MimeType
         'adp' => 'audio/adpcm',
         'au' => 'audio/basic',
         'mid' => 'audio/midi',
+        'mp3' => 'audio/mpeg',
         'mp4a' => 'audio/mp4',
         'mpga' => 'audio/mpeg',
         'oga' => 'audio/ogg',
@@ -787,6 +788,6 @@ class MimeType
     {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
-        return collect(self::$mimes)->get($extension, 'application/octet-stream');
+        return self::$mimes[$extension] ?? 'application/octet-stream';
     }
 }
