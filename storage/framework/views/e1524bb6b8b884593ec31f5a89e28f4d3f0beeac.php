@@ -1,3 +1,10 @@
+<?php
+use Illuminate\Support\Facades\Auth;
+use App\Models;
+use Illuminate\Support\Facades\Session;
+?>
+
+
 <?php $__env->startSection('css'); ?>
     <link href="css/jquery.terminal-1.5.3.css" rel="stylesheet"/>
     <link href="css/style.css" rel="stylesheet"/>
@@ -5,6 +12,51 @@
 
 <?php $__env->startSection('topscript'); ?>
     <script src="js/jquery.terminal-1.5.3.js"></script>
+    <script>
+        var countDownDate = <?php
+            $user = Models\user::find(Auth::id())->first();
+            $time = Models\level::find($user->level_id)->first()->time;
+            $startTime = $user->updated_at;
+            if ($user->status == 'PLAYING')
+                echo $time + strtotime($startTime);
+            else
+                echo 0;
+        ?>;
+
+        if (countDownDate != 0) {
+                // Update the count down every 1 second
+                var x = setInterval(function() {
+                    // Get todays date and time
+                    var now = Math.round(new Date().getTime()/1000);
+
+                    // Find the distance between now an the count down date
+                    var distance = countDownDate - now;
+
+                    // Time calculations for hours, minutes and seconds
+                    var hours = Math.floor(distance / (60 * 60));
+                    var minutes = Math.floor((distance % (60 * 60)) / (60));
+                    var seconds = Math.floor(distance % 60);
+
+                    // Display the result
+                    document.getElementById("timer").innerHTML = hours + " : " + minutes + " : " + seconds + " : ";
+
+                    // countdown fininshed.
+                    if (distance < 0) {
+                        clearInterval(x);
+                        <?php
+                            //setting status field to timeout and removing the question directory
+                            $user = Models\user::find(Auth::id())->first();
+                            $question_name=Models\level::find($user->level_id)->first()->name;
+                            $user->status = 'TIMEOUT';
+                            $user->save();
+                            $full_path = storage_path()."/app/public/";
+                            shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
+                            Session::put('pwd', '~');
+                        ?>
+                    }
+                }, 1000);
+        }
+    </script>
     <script>
         var editor;
         var fileName = false;
@@ -136,6 +188,8 @@
             </div>
         </div>
 
+        <!--Countdown timer-->
+        <div id = "timer"></div>
         <!--Editor-->
         <div class="editor row">
 
