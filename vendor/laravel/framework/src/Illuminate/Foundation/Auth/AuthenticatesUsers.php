@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 
 trait AuthenticatesUsers
 {
@@ -40,7 +41,7 @@ trait AuthenticatesUsers
         }
 
         if ($this->attemptLogin($request)) {
-            session(['pwd' => '~']);
+            Session::put('pwd','~');
             return $this->sendLoginResponse($request);
         }
 
@@ -87,9 +88,7 @@ trait AuthenticatesUsers
      */
     protected function credentials(Request $request)
     {
-        //return $request->only($this->username(), 'password'); include active
-        $field = $this->username();
-        return [$field => $request[$field], 'password' => $request['password'], 'active' => 1];
+        return $request->only($this->username(), 'password');
     }
 
     /**
@@ -128,15 +127,9 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        $errors = [$this->username() => trans('auth.failed')];
-
-        if ($request->expectsJson()) {
-            return response()->json($errors, 422);
-        }
-
-        return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors($errors);
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     /**
