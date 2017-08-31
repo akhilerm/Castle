@@ -1,8 +1,4 @@
-<?php
-use Illuminate\Support\Facades\Auth;
-use App\Models;
-use Illuminate\Support\Facades\Session;
-?>
+
 @extends('layouts.app')
 
 @section('css')
@@ -13,17 +9,9 @@ use Illuminate\Support\Facades\Session;
 @section('topscript')
     <script src="js/jquery.terminal-1.5.3.js"></script>
     <script>
-        var countDownDate = <?php
-            $user = Models\user::find(Auth::id())->first();
-            $time = Models\level::find($user->level_id)->first()->time;
-            $startTime = $user->updated_at;
-            if ($user->status == 'PLAYING')
-                echo $time + strtotime($startTime);
-            else
-                echo 0;
-        ?>;
+        var countDownDate = {{ $time }};
 
-        if (countDownDate != 0) {
+        if (countDownDate !== 0) {
                 // Update the count down every 1 second
                 var x = setInterval(function() {
                     // Get todays date and time
@@ -43,16 +31,13 @@ use Illuminate\Support\Facades\Session;
                     // countdown fininshed.
                     if (distance < 0) {
                         clearInterval(x);
-                        <?php
-                            //setting status field to timeout and removing the question directory
-                            $user = Models\user::find(Auth::id())->first();
-                            $question_name=Models\level::find($user->level_id)->first()->name;
-                            $user->status = 'TIMEOUT';
-                            $user->save();
-                            $full_path = storage_path()."/app/public/";
-                            shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
-                            Session::put('pwd', '~');
-                        ?>
+                        $.post("/timeout",{ '_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
+                            if (data['MSG'] === true ){
+                                alert('Timed Out');
+                            }
+                        }).fail(function(response) {
+                            alert('Error: ' + response.responseText);
+                        });
                     }
                 }, 1000);
         }
@@ -195,9 +180,10 @@ use Illuminate\Support\Facades\Session;
 
 
             <div class="row input-block">
-                    <textarea id='input'>
 
+                    <textarea id='input'>
                      </textarea>
+
             </div>
 
             <div class="navigation row">

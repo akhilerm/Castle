@@ -23,6 +23,8 @@ Route::post('/shell','ShellContoller@shell')->name('shell');
 
 Route::post('/editor', 'EditorController@index')->name('editor');
 
+Route::post('/timeout','HomeController@timeout')->name('timeout');
+
 /**
  * Route just for test
  */
