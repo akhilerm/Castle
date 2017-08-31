@@ -82,7 +82,7 @@ class ShellContoller extends Controller
         } elseif ($args[0] === '.') {
 
             //Keeping it in the same directory
-            $msg = Auth::user()['name'] . '@Castle:~';
+            $msg = Auth::user()['name'] . '@Castle:~$ ';
 
             //constructing the prompt depending on directory
             if (Session::get('pwd') !== '~')
