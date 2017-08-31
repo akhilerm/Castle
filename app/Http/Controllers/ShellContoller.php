@@ -139,6 +139,7 @@ class ShellContoller extends Controller
 
         //Check IF file exist and get content
         if (Storage::has($user_dir)) {
+
             //Check if file is directory
             if(!is_dir(storage_path().'/app/'.$user_dir)) {
                 $msg = Storage::get($user_dir);
