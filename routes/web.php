@@ -28,5 +28,6 @@ Route::post('/editor', 'EditorController@index')->name('editor');
  */
 
 Route::get('/test',function (){
-    return storage_path();
+    
+    return 'Success';
 });
