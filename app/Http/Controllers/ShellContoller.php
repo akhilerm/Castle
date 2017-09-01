@@ -72,48 +72,45 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($args[0] !== false){
-            if ($args[0] === '..' || $args[0] === '~') {
+        if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
 
-                //move to home directory
-                Session::put('pwd', '~');
-                $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
-                $sts = true;
+            //move to home directory
+            Session::put('pwd', '~');
+            $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
+            $sts = true;
 
-            } elseif ($args[0] === '.') {
+        } elseif ($args[0] === '.') {
 
-                //Keeping it in the same directory
-                $msg = Auth::user()['name'] . '@Castle:~$ ';
-                //constructing the prompt depending on directory
-                if (Session::get('pwd') !== '~')
-                    $msg = $msg . "/" . session('pwd') . '$ ';
-                $sts = true;
+            //Keeping it in the same directory
+            $msg = Auth::user()['name'] . '@Castle:~$ ';
 
-            } else {
+            //constructing the prompt depending on directory
+            if (Session::get('pwd') !== '~')
+                $msg = $msg . "/" . session('pwd') . '$ ';
+            $sts = true;
 
-                //ADDRESS TO  Users home directory
-                $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
-                //Check if the folder exists if in home
-                if (Session::get('pwd') === '~') {
+        } else {
 
-                    $user_dir = "$user_dir/$args[0]";
-                    if (is_dir(storage_path().'/app/'.$user_dir)) {
+            //ADDRESS TO  Users home directory
+            $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
 
-                        Session::put('pwd', $args[0]);
-                        $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                        $sts = true;
-                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+            //Check if the folder exists if in home
+            if (Session::get('pwd') === '~') {
 
-                    }
+                $user_dir = "$user_dir/$args[0]";
+                if (is_dir(storage_path().'/app/'.$user_dir)) {
+
+                    Session::put('pwd', $args[0]);
+                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                    $sts = true;
+                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
 
                 }
-                //No Directory by that name
-                $msg = "cd: $args[0]: No such directory";
-                $sts = false;
             }
-        } else{
+
+            //No Directory by that name
+            $msg = "cd: $args[0]: No such directory";
             $sts = false;
-            $msg = 'No Arguments Given';
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
