@@ -9,12 +9,12 @@ userid=$4
 
 #preparing folder for code testing. changing test case file name and creating python module by __init__.py
 sed -i s/question_test_file/$question/g $workdir/answers/driver.py
-touch $workdir/users/$userid/$question/__init__.py
+touch $workdir/users/1/$question/__init__.py
 
 result=$(docker run --rm -v $workdir/users/$userid/$question:/tmp/user:ro -v $workdir/answers:/tmp/answer:ro python:df)
 
 #reverting back the changes made before execution
-rm $workdir/users/$userid/$question/__init__.py
+rm $workdir/users/1/$question/__init__.py
 sed -i s/$question/question_test_file/g $workdir/answers/driver.py
 
 if [ -z "$result" ];
