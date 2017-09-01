@@ -29,7 +29,7 @@ class HomeController extends Controller
     public function index()
     {
         $user = user::find(Auth::id())->first();
-        $time = level::find($user['level_id'])->first()->time;
+        $time = level::find($user['level_id'])->first()['time'];
         $startTime = $user['updated_at'];
         if ($user['status'] === 'PLAYING'){
             $result = $time + strtotime($startTime);
@@ -46,7 +46,6 @@ class HomeController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
      */
-
     public function timeout(Request $request){
 
         if ($request->ajax()){

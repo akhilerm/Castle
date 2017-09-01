@@ -30,6 +30,5 @@ Route::post('/timeout','HomeController@timeout')->name('timeout');
  */
 
 Route::get('/test',function (){
-    
-    return 'Success';
+    return \Illuminate\Support\Facades\Auth::id();
 });
