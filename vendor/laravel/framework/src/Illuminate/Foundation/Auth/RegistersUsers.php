@@ -43,13 +43,6 @@ trait RegistersUsers
             Storage::deleteDirectory($user_dir);
         }
 
-        //find all sub dirs in default and create them as well
-        $directories = Storage::allDirectories($default);
-        foreach ($directories as  $directory){
-            $formatted = strtr($directory, [  $default => $user_dir]);
-            Storage::makeDirectory($formatted);
-        }
-
         //Find all files in default  dir and make a copy of it to main folder
         $files = Storage::allFiles($default);
         foreach ($files as $file){
