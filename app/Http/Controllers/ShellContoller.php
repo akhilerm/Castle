@@ -72,45 +72,48 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
+        if ($args[0] !== false){
+            if ($args[0] === '..' || $args[0] === '~') {
 
-            //move to home directory
-            Session::put('pwd', '~');
-            $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
-            $sts = true;
+                //move to home directory
+                Session::put('pwd', '~');
+                $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
+                $sts = true;
 
-        } elseif ($args[0] === '.') {
+            } elseif ($args[0] === '.') {
 
-            //Keeping it in the same directory
-            $msg = Auth::user()['name'] . '@Castle:~$ ';
+                //Keeping it in the same directory
+                $msg = Auth::user()['name'] . '@Castle:~$ ';
+                //constructing the prompt depending on directory
+                if (Session::get('pwd') !== '~')
+                    $msg = $msg . "/" . session('pwd') . '$ ';
+                $sts = true;
 
-            //constructing the prompt depending on directory
-            if (Session::get('pwd') !== '~')
-                $msg = $msg . "/" . session('pwd') . '$ ';
-            $sts = true;
+            } else {
 
-        } else {
+                //ADDRESS TO  Users home directory
+                $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+                //Check if the folder exists if in home
+                if (Session::get('pwd') === '~') {
 
-            //ADDRESS TO  Users home directory
-            $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
+                    $user_dir = "$user_dir/$args[0]";
+                    if (is_dir(storage_path().'/app/'.$user_dir)) {
 
-            //Check if the folder exists if in home
-            if (Session::get('pwd') === '~') {
+                        Session::put('pwd', $args[0]);
+                        $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                        $sts = true;
+                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
 
-                $user_dir = "$user_dir/$args[0]";
-                if (is_dir(storage_path().'/app/'.$user_dir)) {
-
-                    Session::put('pwd', $args[0]);
-                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                    $sts = true;
-                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
+                    }
 
                 }
+                //No Directory by that name
+                $msg = "cd: $args[0]: No such directory";
+                $sts = false;
             }
-
-            //No Directory by that name
-            $msg = "cd: $args[0]: No such directory";
+        } else{
             $sts = false;
+            $msg = 'No Arguments Given';
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
@@ -374,12 +377,12 @@ class ShellContoller extends Controller
 
             $sts = true;
             $msg = 'Solution submitted successfully';
-            $full_path = storage_path()."/app/".$settings['WORK_DIR'];
+            $full_path = storage_path().'/app/'.$settings['WORK_DIR'];
             $user = Models\user::find(Auth::id())->first();
             $level_id = $user->level_id;
             $question_name = Models\level::find($level_id)->name;
             //remove question folder
-            shell_exec("rm -r ".$full_path."users/".Auth::id()."/".$question_name);
+            shell_exec('rm -r '.$full_path.'users/'.Auth::id().'/'.$question_name);
             //change pwd
             Session::put('pwd', '~');
             $user->status = 'COMPLETED';
@@ -492,22 +495,22 @@ class ShellContoller extends Controller
     {
         //write code to check each command and its arguments.
         switch ($req['method']) {
-            case "help":
-            case "logout":
-            case "request":
-            case "status":
+            case 'help':
+            case 'logout':
+            case 'request':
+            case 'status':
                 if (!isset($req['args']))
                     return true;
                 break;
-            case "ls":
-            case "cd":
+            case 'ls':
+            case 'cd':
                 if (!isset($req['args']) || sizeof($req['args']) <= 1)
                     return true;
                 break;
-            case "cat":
-            case "verify":
-            case "submit":
-            case "edit":
+            case 'cat':
+            case 'verify':
+            case 'submit':
+            case 'edit':
                 if (isset($req['args']) && sizeof($req['args']) == 1)
                     return true;
                 break;
