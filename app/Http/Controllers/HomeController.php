@@ -49,7 +49,6 @@ class HomeController extends Controller
     public function timeout(Request $request){
 
         if ($request->ajax()){
-
             $user = user::find(Auth::id())->first();
             $question_name=level::find($user['level_id'])->first()['name'];
             $user['status'] = 'TIMEOUT';
