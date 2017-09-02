@@ -50,7 +50,9 @@ class HomeController extends Controller
 
         if ($request->ajax()){
             $user = user::find(Auth::id())->first();
+            error_log('LEVEL_ID:'.$user['level_id']);
             $question_name=level::find($user['level_id'])->first()['name'];
+            error_log('Q_NAME:'.$question_name);
             $user['status'] = 'TIMEOUT';
             $user->save();
             Storage::deleteDirectory('public/users/'.Auth::id().'/'.$question_name);
