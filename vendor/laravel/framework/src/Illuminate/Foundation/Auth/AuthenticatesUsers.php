@@ -41,7 +41,6 @@ trait AuthenticatesUsers
         }
 
         if ($this->attemptLogin($request)) {
-            Session::put('pwd','~');
             return $this->sendLoginResponse($request);
         }
 
