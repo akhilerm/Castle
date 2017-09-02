@@ -28,6 +28,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if(!Session::has('pwd')){
+            Session::put('pwd','~');
+        }
         $user = user::find(Auth::id())->first();
         $time = level::find($user['level_id'])->first()['time'];
         $startTime = $user['updated_at'];
