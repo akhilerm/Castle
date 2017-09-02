@@ -12,19 +12,19 @@
         var editor;
         var fileName = false;
         var countDownDate = {{ $time }};
-        var timer;
+        var clock;
 
         $(document).ready(function () {
 
             editor = $("#input");
-            timer = $("#timer");
-            timer.hide();
+            clock = $("#time");
+            clock.hide();
 
-            if (countDownDate !== 0) {
-                // Update the count down every 1 second
-                var x = setInterval(function() {
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+                if (countDownDate !== 0) {
                     // Get todays date and time
-                    var now = Math.round(new Date().getTime()/1000);
+                    var now = Math.round(new Date().getTime() / 1000);
 
                     // Find the distance between now an the count down date
                     var distance = countDownDate - now;
@@ -35,24 +35,26 @@
                     var seconds = Math.floor(distance % 60);
 
                     // Display the result
-                    timer.val(hours + " : " + minutes + " : " + seconds);
-                    timer.show();
-
+                    clock.text(hours + " : " + minutes + " : " + seconds);
+                    if (!clock.is(":visible")){
+                        clock.show();
+                    }
                     // countdown fininshed.
                     if (distance === 0) {
                         clearInterval(x);
-                        $.post("/timeout",{ '_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
-                            if (data['MSG'] === true ){
+                        $.post("/timeout", {'_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
+                            if (data['result'] === true) {
                                 alert('Timed Out');
-                                timer.val("0:0:0");
-                                timer.hide();
+                                countDownDate = 0;
+                                clock.text("00:00:00");
+                                clock.hide();
                             }
-                        }).fail(function(response) {
+                        }).fail(function (response) {
                             alert('Error: ' + response.responseText);
                         });
                     }
-                }, 1000);
-            }
+                }
+            }, 1000);
 
 
             var saveData = function () {
@@ -179,16 +181,16 @@
         </div>
 
         <!--Countdown timer-->
-        <div id = "timer"></div>
+        <div class="row">
+            <span id="time">Test</span>
+        </div>
         <!--Editor-->
         <div class="editor row">
 
 
             <div class="row input-block">
-
                     <textarea id='input'>
                      </textarea>
-
             </div>
 
             <div class="navigation row">
