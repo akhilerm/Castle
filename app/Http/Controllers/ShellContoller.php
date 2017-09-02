@@ -242,6 +242,7 @@ class ShellContoller extends Controller
     public function request($args, $settings)
     {
         $list = Storage::directories($settings['WORK_DIR'].'users/'.Auth::id().'/');
+        $time = 0;
 
         //check if any directories are already present
         if (sizeof($list) > 0) {
@@ -254,29 +255,28 @@ class ShellContoller extends Controller
             $user_level = $this->getLevelData();
 
             //Check the current status of user and increment it unless game is over
-            if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
+            if ($user_level['status'] === 'COMPLETED') {
+                if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
-                $msg = 'No more challenges. You did it.';
-                return response()->json([ 'STS' => true, 'MSG' => $msg]);
+                    $msg = 'No more challenges. You did it.';
+                    return response()->json(['STS' => true, 'MSG' => $msg]);
 
-            }
-            elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
+                } elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
 
-                $user_level['sublevel'] = 1;
-                $user_level['level']++;
+                    $user_level['sublevel'] = 1;
+                    $user_level['level']++;
 
-            }
-            else {
+                } else {
 
-                $user_level['sublevel']++;
+                    $user_level['sublevel']++;
 
+                }
             }
 
             $new_level = Models\level::where('level', '=', $user_level['level'])->where('sub_level', '=', $user_level['sublevel'])->inRandomOrder()->first();
             $question_name = $new_level->name;
             $question_id = $new_level->id;
             $full_path = storage_path()."/app/".$settings['WORK_DIR'];
-            //copy question to user directory -- will not work with $settings['WORK_DIR']
             shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
             //create solution.py file
             shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
@@ -285,14 +285,20 @@ class ShellContoller extends Controller
             $user->level_id = $question_id;
             $user->status = 'PLAYING';
             $user->save();
+            error_log("SAVED new level data");
             //add code to start new countdown
-
+            //$user = Models\user::find(Auth::id());
+            $startTime = \DateTime::ATOM;
+                //$user->updated_at;
+            $duration = $new_level->time;
+            $time = $duration + strtotime($startTime);
+            error_log("TIMR CALCULATED".$time);
             $sts = true;
             $msg = 'New challenge added.';
 
         }
 
-        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+        return response()->json(['STS' => $sts, 'MSG' => $msg, 'TIME' => $time]);
     }
 
     /**
@@ -478,9 +484,11 @@ class ShellContoller extends Controller
         $level_data = Models\level::find($level_id);
         $level = $level_data->level;
         $sublevel = $level_data->sub_level;
+        $time = $level_id->time;
         $max_level = Models\level::orderBy('level', 'DESC')->first()->level;
         $max_sublevel = Models\level::where('level', '=', $level)->orderBy('sub_level', 'DESC')->first()->sub_level;
-        return array('level' => $level, 'sublevel' => $sublevel, 'max_level' => $max_level, 'max_sublevel' => $max_sublevel, 'status' => $status);
+        error_log("GETTING LEVEL DATA: level".$level);
+        return array('level' => $level, 'sublevel' => $sublevel, 'max_level' => $max_level, 'max_sublevel' => $max_sublevel, 'status' => $status, 'time' => $time);
     }
 
     /**

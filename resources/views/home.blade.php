@@ -9,7 +9,7 @@
 @section('topscript')
     <script src="js/jquery.terminal-1.5.3.js"></script>
     <script>
-        var countDownDate = {{ $time }};
+        //var countDownDate = {{ $time }};
 
         if (countDownDate !== 0) {
                 // Update the count down every 1 second
@@ -29,7 +29,7 @@
                     document.getElementById("timer").innerHTML = hours + " : " + minutes + " : " + seconds;
 
                     // countdown fininshed.
-                    if (distance < 0) {
+                    if (distance = 0) {
                         clearInterval(x);
                         $.post("/timeout",{ '_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
                             if (data['MSG'] === true ){
@@ -116,6 +116,7 @@
                             setTimeout(function () {
                                 term.echo(data['MSG']);
                             }, 200);
+                            countDownDate = data['TIME'];
                             break;
                         case "clear":
                             term.clear();
