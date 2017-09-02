@@ -287,9 +287,8 @@ class ShellContoller extends Controller
             $user->save();
             error_log("SAVED new level data");
             //add code to start new countdown
-            //$user = Models\user::find(Auth::id());
-            $startTime = \DateTime::ATOM;
-                //$user->updated_at;
+            $user = Models\user::find(Auth::id());
+            $startTime = $user->updated_at;
             $duration = $new_level->time;
             $time = $duration + strtotime($startTime);
             error_log("TIMR CALCULATED".$time);
