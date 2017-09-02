@@ -9,9 +9,18 @@
 @section('topscript')
     <script src="js/jquery.terminal-1.5.3.js"></script>
     <script>
-        //var countDownDate = {{ $time }};
+        var editor;
+        var fileName = false;
+        var countDownDate = {{ $time }};
+        var timer;
 
-        if (countDownDate !== 0) {
+        $(document).ready(function () {
+
+            editor = $("#input");
+            timer = $("#timer");
+            timer.hide();
+
+            if (countDownDate !== 0) {
                 // Update the count down every 1 second
                 var x = setInterval(function() {
                     // Get todays date and time
@@ -26,29 +35,25 @@
                     var seconds = Math.floor(distance % 60);
 
                     // Display the result
-                    document.getElementById("timer").innerHTML = hours + " : " + minutes + " : " + seconds;
+                    timer.val(hours + " : " + minutes + " : " + seconds);
+                    timer.show();
 
                     // countdown fininshed.
-                    if (distance = 0) {
+                    if (distance === 0) {
                         clearInterval(x);
                         $.post("/timeout",{ '_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
                             if (data['MSG'] === true ){
                                 alert('Timed Out');
+                                timer.val("0:0:0");
+                                timer.hide();
                             }
                         }).fail(function(response) {
                             alert('Error: ' + response.responseText);
                         });
                     }
                 }, 1000);
-        }
-    </script>
-    <script>
-        var editor;
-        var fileName = false;
+            }
 
-        $(document).ready(function () {
-
-            editor = $("#input");
 
             var saveData = function () {
                 if(fileName !== false){
@@ -96,71 +101,70 @@
 
             });
 
-        });
+            jQuery(function($, undefined) {
+                $('#term').terminal(function(command, term) {
+                    var cmd = $.terminal.parse_command(command);
+                    this.pause();
+                    $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :cmd.args}, function (data) {
+                        term.resume();
+                        switch (cmd.name){
+                            case "cd":
+                                if (data['STS'] === true)
+                                    term.set_prompt(data['MSG']);
+                                else
+                                    term.echo(data['MSG']);
+                                break;
+                            case "request":
+                                term.echo("\nRequesting challenge...");
+                                term.echo(data['MSG']);
+                                countDownDate = data['TIME'];
+                                break;
+                            case "clear":
+                                term.clear();
+                                break;
+                            case "logout":
+                                if (data['STS'] === true) {
+                                    term.echo(data['MSG']);
+                                    location.reload();
+                                }
+                                else{
+                                    term.echo(data['MSG']);
+                                }
+                                break;
+                            case "submit":
+                                if (data['STS'] === true)
+                                    term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
+                                term.echo(data['MSG']);
+                                break;
+                            case "edit":
+                                if(data["STS"] === true){
+                                    editor.val(data['MSG']);
+                                    fileName = data['FILE'];
+                                } else{
+                                    term.echo(data['MSG']);
+                                }
+                                break;
+                            default:
+                                term.echo(data['MSG']);
+                                break;
 
-        jQuery(function($, undefined) {
-            $('#term').terminal(function(command, term) {
-                var cmd = $.terminal.parse_command(command);
-                this.pause();
-                $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :cmd.args}, function (data) {
-                    term.resume();
-                    switch (cmd.name){
-                        case "cd":
-                            if (data['STS'] === true)
-                                term.set_prompt(data['MSG']);
-                            else
-                                term.echo(data['MSG']);
-                            break;
-                        case "request":
-                            term.echo("\nRequesting challenge...");
-                            setTimeout(function () {
-                                term.echo(data['MSG']);
-                            }, 200);
-                            countDownDate = data['TIME'];
-                            break;
-                        case "clear":
-                            term.clear();
-                            break;
-                        case "logout":
-                            if (data['STS'] === true) {
-                                term.echo(data['MSG']);
-                                location.reload();
-                            }
-                            else{
-                                term.echo(data['MSG']);
-                            }
-                            break;
-                        case "submit":
-                            if (data['STS'] === true)
-                                term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
-                            term.echo(data['MSG']);
-                            break;
-                        case "edit":
-                            if(data["STS"] === true){
-                                editor.val(data['MSG']);
-                                fileName = data['FILE'];
-                            } else{
-                                term.echo(data['MSG']);
-                            }
-                            break;
-                        default:
-                            term.echo(data['MSG']);
-                            break;
+                        };
 
-                    };
-
+                    });
+                }, {
+                    tabcompletion: true,
+                    completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
+                        callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
+                    },
+                    greetings: 'Mounting /home/<?php echo Auth::user()['name']; ?>...',
+                    name: 'js',
+                    height: 200,
+                    prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
                 });
-            }, {
-                tabcompletion: true,
-                completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
-                    callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
-                },
-                greetings: 'Mounting /home/<?php echo Auth::user()['name']; ?>...',
-                name: 'js',
-                height: 200,
-                prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
             });
+
         });
+
     </script>
 
 @endsection>
