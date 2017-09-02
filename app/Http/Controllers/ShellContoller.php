@@ -483,7 +483,7 @@ class ShellContoller extends Controller
         $level_data = Models\level::find($level_id);
         $level = $level_data->level;
         $sublevel = $level_data->sub_level;
-        $time = $level_id->time;
+        $time = $level_data->time;
         $max_level = Models\level::orderBy('level', 'DESC')->first()->level;
         $max_sublevel = Models\level::where('level', '=', $level)->orderBy('sub_level', 'DESC')->first()->sub_level;
         error_log("GETTING LEVEL DATA: level".$level);
