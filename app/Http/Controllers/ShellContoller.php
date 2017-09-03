@@ -247,7 +247,7 @@ class ShellContoller extends Controller
         //check if any directories are already present
         if (sizeof($list) > 0) {
 
-            $sts = true;
+            $sts = false;
             $msg = "You can request a new challenge only after completing the current challenge. \n";
 
         } else {
@@ -259,7 +259,7 @@ class ShellContoller extends Controller
                 if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
                     $msg = 'No more challenges. You did it.';
-                    return response()->json(['STS' => true, 'MSG' => $msg]);
+                    return response()->json(['STS' => false, 'MSG' => $msg]);
 
                 } elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
 
