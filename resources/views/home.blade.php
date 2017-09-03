@@ -119,7 +119,8 @@
                             case "request":
                                 term.echo("\nRequesting challenge...");
                                 term.echo(data['MSG']);
-                                countDownDate = data['TIME'];
+                                if (data['STS'] == true)
+                                    countDownDate = data['TIME'];
                                 break;
                             case "clear":
                                 term.clear();
