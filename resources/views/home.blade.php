@@ -13,7 +13,7 @@
         var fileName = false;
         var countDownDate = {{ $time }};
         var clock;
-
+        var terminal;
         $(document).ready(function () {
 
             editor = $("#input");
@@ -43,6 +43,7 @@
                                 countDownDate = 0;
                                 clock.text("00:00:00");
                                 clock.hide();
+                                terminal.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ ');
                             }
                         }).fail(function (response) {
                             alert('Error: ' + response.responseText);
@@ -107,6 +108,7 @@
 
             jQuery(function($, undefined) {
                 $('#term').terminal(function(command, term) {
+                    terminal = term;
                     var cmd = $.terminal.parse_command(command);
                     this.pause();
                     $.post("/shell",{ '_token': $('meta[name=csrf-token]').attr('content'), method: cmd.name, args :cmd.args}, function (data) {
