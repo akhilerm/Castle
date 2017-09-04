@@ -31,13 +31,30 @@ class HomeController extends Controller
         if(!Session::has('pwd')){
             Session::put('pwd','~');
         }
-        $user = user::find(Auth::id())->first();
-        $time = level::find($user['level_id'])->first()['time'];
+        $user = user::find(Auth::id());
+        $level = level::find($user['level_id']);
+        $time = $level->time;
+        error_log('TIME IN INDEX:'.$time);
         $startTime = $user['updated_at'];
-        if ($user['status'] === 'PLAYING'){
+        error_log('STARTIME_INDEX:'.strtotime($startTime));
+        error_log('CUR TIME:'.time());
+        //if timed out.
+        if ($time + strtotime($startTime) <= time()) {
+            error_log('LEVEL_ID:'.$user['level_id']);
+            $question_name=$level->name;
+            error_log('Q_NAME:'.$question_name);
+            $user['status'] = 'TIMEOUT';
+            $user->save();
+            Storage::deleteDirectory('public/users/'.Auth::id().'/'.$question_name);
+            Session::put('pwd', '~');
+            $result = 0;
+        }
+        else if ($user['status'] == 'PLAYING'){
             $result = $time + strtotime($startTime);
+            error_log('RESUKLT in INDEX:'.$result);
         } else{
             $result =  0;
+            error_log('RESULT 0');
         }
         return view('home',['time' => $result]);
     }
@@ -52,10 +69,9 @@ class HomeController extends Controller
     public function timeout(Request $request){
 
         if ($request->ajax()){
-
-            $user = user::find(Auth::id())->first();
+            $user = user::find(Auth::id());
             error_log('LEVEL_ID:'.$user['level_id']);
-            $question_name=level::find($user['level_id'])->first()['name'];
+            $question_name=level::where('id', '=', $user['level_id'])->first()['name'];
             error_log('Q_NAME:'.$question_name);
             $user['status'] = 'TIMEOUT';
             $user->save();
