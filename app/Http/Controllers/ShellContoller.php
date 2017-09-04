@@ -380,7 +380,7 @@ class ShellContoller extends Controller
             $sts = true;
             $msg = 'Solution submitted successfully';
             $full_path = storage_path().'/app/'.$settings['WORK_DIR'];
-            $user = Models\user::find(Auth::id())->first();
+            $user = Models\user::find(Auth::id());
             $level_id = $user->level_id;
             $question_name = Models\level::find($level_id)->name;
             //remove question folder
@@ -420,7 +420,7 @@ class ShellContoller extends Controller
         if (Storage::has($user_dir)) {
             if (strpos($args[0], 'solution') !== false) {
 
-                $level_id = Models\user::find(Auth::id())->first()->level_id;
+                $level_id = Models\user::find(Auth::id())->level_id;
                 $question_name = Models\level::find($level_id)->name;
                 $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
                 //executing the code
