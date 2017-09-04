@@ -32,12 +32,16 @@ class HomeController extends Controller
             Session::put('pwd','~');
         }
         $user = user::find(Auth::id())->first();
-        $time = level::find($user['level_id'])->first()['time'];
+        $time = level::where('id', '=', $user['level_id'])->first()['time'];
+        error_log('TIME IN INDEX:'.$time);
         $startTime = $user['updated_at'];
-        if ($user['status'] === 'PLAYING'){
+        error_log('STARTIME_INDEX:'.$startTime);
+        if ($user['status'] == 'PLAYING'){
             $result = $time + strtotime($startTime);
+            error_log('RESUKLT in INDEX:'.$result);
         } else{
             $result =  0;
+            error_log('RESULT 0');
         }
         return view('home',['time' => $result]);
     }

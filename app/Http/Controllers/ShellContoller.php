@@ -255,7 +255,7 @@ class ShellContoller extends Controller
             $user_level = $this->getLevelData();
 
             //Check the current status of user and increment it unless game is over
-            if ($user_level['status'] === 'COMPLETED') {
+            if ($user_level['status'] !== 'PLAYING') {
                 if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
 
                     $msg = 'No more challenges. You did it.';
