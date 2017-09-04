@@ -477,7 +477,7 @@ class ShellContoller extends Controller
      */
     function getLevelData()
     {
-        $user = Models\user::find(Auth::id())->first();
+        $user = Models\user::find(Auth::id());
         $level_id = $user->level_id;
         $status = $user->status;
         $level_data = Models\level::find($level_id);
