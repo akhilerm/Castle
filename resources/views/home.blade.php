@@ -44,6 +44,7 @@
                                 clock.text("00:00:00");
                                 clock.hide();
                                 terminal.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ ');
+                                fileName = false;
                             }
                         }).fail(function (response) {
                             alert('Error: ' + response.responseText);
