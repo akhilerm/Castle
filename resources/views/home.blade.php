@@ -40,8 +40,8 @@
                         clock.show();
                     }
                     // countdown fininshed.
-                    if (distance === 0) {
-                        clearInterval(x);
+                    if (distance <= 0) {
+                        //clearInterval(x);
                         $.post("/timeout", {'_token': $('meta[name=csrf-token]').attr('content')}, function (data) {
                             if (data['result'] === true) {
                                 alert('Timed Out');
@@ -72,6 +72,7 @@
            var closeEditor = function () {
                 editor.val("");
                 fileName = false;
+                //editor.hide();
             };
 
             $("#save").click(saveData);
