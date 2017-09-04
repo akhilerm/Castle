@@ -136,8 +136,11 @@
                                 }
                                 break;
                             case "submit":
-                                if (data['STS'] === true)
+                                if (data['STS'] === true) {
                                     term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
+                                    clock.text("");
+                                    clock.hide();
+                                }
                                 term.echo(data['MSG']);
                                 break;
                             case "edit":
