@@ -182,9 +182,10 @@
 @endsection>
 
 @section('content')
-    <!--Terminal-->
+
     <div class="container">
 
+        <!--Terminal-->
         <div class="row">
             <div id="term">
             </div>
@@ -194,6 +195,7 @@
         <div class="row">
             <span id="time">Test</span>
         </div>
+
         <!--Editor-->
         <div class="editor row">
 
