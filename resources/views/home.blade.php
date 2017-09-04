@@ -34,11 +34,6 @@
                     var minutes = Math.floor((distance % (60 * 60)) / (60));
                     var seconds = Math.floor(distance % 60);
 
-                    // Display the result
-                    clock.text(hours + " : " + minutes + " : " + seconds);
-                    if (!clock.is(":visible")){
-                        clock.show();
-                    }
                     // countdown fininshed.
                     if (distance <= 0) {
                         //clearInterval(x);
@@ -52,6 +47,12 @@
                         }).fail(function (response) {
                             alert('Error: ' + response.responseText);
                         });
+                    }
+
+                    // Display the result
+                    clock.text(hours + " : " + minutes + " : " + seconds);
+                    if (!clock.is(":visible")){
+                        clock.show();
                     }
                 }
             }, 1000);
