@@ -31,8 +31,8 @@ class HomeController extends Controller
         if(!Session::has('pwd')){
             Session::put('pwd','~');
         }
-        $user = user::find(Auth::id())->first();
-        $time = level::where('id', '=', $user['level_id'])->first()['time'];
+        $user = user::find(Auth::id());
+        $time = level::find($user['level_id'])->time;
         error_log('TIME IN INDEX:'.$time);
         $startTime = $user['updated_at'];
         error_log('STARTIME_INDEX:'.$startTime);
@@ -56,7 +56,7 @@ class HomeController extends Controller
     public function timeout(Request $request){
 
         if ($request->ajax()){
-            $user = user::find(Auth::id())->first();
+            $user = user::find(Auth::id());
             error_log('LEVEL_ID:'.$user['level_id']);
             $question_name=level::where('id', '=', $user['level_id'])->first()['name'];
             error_log('Q_NAME:'.$question_name);
