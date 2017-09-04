@@ -140,6 +140,7 @@
                                     term.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:~$ ');
                                     clock.text("");
                                     clock.hide();
+                                    countDownDate = 0;
                                 }
                                 term.echo(data['MSG']);
                                 break;
