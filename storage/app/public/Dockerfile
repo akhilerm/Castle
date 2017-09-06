@@ -4,7 +4,7 @@ MAINTAINER Akhil Mohan "akhilerm@gmail.com"
 
 RUN apt-get update
 RUN apt-get install -y python
-RUN mkdir /tmp/user /tmp/answer
+RUN mkdir /tmp/user /tmp/answer /tmp/driver
 
 ENV PYTHONPATH=/tmp/user
 

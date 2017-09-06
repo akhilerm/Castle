@@ -14,15 +14,6 @@ elif [[ $filename == *".py"* ]];
 	then lang="PYTHON"
 fi
 
-case $lang in
-	JAVA )
-	echo "JAVA"
-	;;
-	PYTHON )
-	echo "PYTHON"
-	;;
-esac
-
 #preparing folder for code testing. changing test case file name and creating python module by __init__.py
 # sed -i s/question_test_file/$question/g $workdir/answers/driver.py
 # touch $workdir/users/$userid/$question/__init__.py
