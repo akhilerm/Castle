@@ -4,7 +4,13 @@
 
 <div class="container">
     <div class="row">
+
         <div class="col s8 offset-s2">
+            <p>
+                @if(\Illuminate\Support\Facades\Session::has('message'))
+                    {{ \Illuminate\Support\Facades\Session::get('message') }}
+                @endif
+            </p>
 
             <form class="" method="POST" action="{{ route('login') }}">
                 {{ csrf_field() }}

@@ -168,7 +168,7 @@
                     completion: function(command, callback) { ///write tab completion of files also iterating over $pwd here
                         callback(['cd', 'cat', 'clear', 'edit', 'help', 'ls', 'logout', 'request', 'status', 'submit', 'verify']);
                     },
-                    greetings: 'Mounting /home/<?php echo Auth::user()['name']; ?>...',
+                    greetings: 'Mounting [[;#3FBDB8;]/home/<?php echo Auth::user()['name']; ?>...]',
                     name: 'js',
                     height: 200,
                     prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
