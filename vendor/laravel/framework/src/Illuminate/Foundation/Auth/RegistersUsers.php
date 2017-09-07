@@ -64,8 +64,8 @@ trait RegistersUsers
         });
 
         $save_token = new Token;
-        $save_token['token'] = $token;
-        $save_token['user_id'] = $user['id'];
+        $save_token->token = $token;
+        $save_token->user_id = $user['id'];
         $save_token->save();
 
         //Flash in seesion to show in login page
