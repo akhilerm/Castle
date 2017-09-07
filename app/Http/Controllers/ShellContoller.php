@@ -424,7 +424,7 @@ class ShellContoller extends Controller
                 $question_name = Models\level::find($level_id)->name;
                 $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
                 //executing the code
-                $output = shell_exec($full_path . "answers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
+                $output = shell_exec($full_path . "drivers/verify.sh " . $args[0] . " " . $question_name . " " . $full_path . " " . Auth::id());
                 $sts = false;
                 $output_array = explode("\n", $output);
                 //check the result of execution, if execution has failed or not
