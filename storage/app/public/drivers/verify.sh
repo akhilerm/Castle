@@ -14,7 +14,7 @@ elif [[ $filename == *".py"* ]];
 	then lang="PYTHON"
 fi
 
-result=$(docker run --rm -v $workdir/users/$userid/$question:/tmp/user:ro -v $workdir/answers:/tmp/answer:ro -v cont:f /tmp/driver/driver.sh ${lang} ${question})
+result=$(docker run --rm -v $workdir/users/$userid/$question:/tmp/user:ro -v $workdir/answers:/tmp/answer:ro cont:f /tmp/driver/driver.sh ${lang} ${question})
 
 if [[ $result == "FAIL" ]]; then
     echo "FAIL"
