@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 lang=$1
 question=$2
@@ -13,10 +13,10 @@ case $lang in
     cp ../user/solution.py solution.py
     cp ../answer/$question answer
     result=$(timeout 20 python driver.py  2>&1)
-    if [ -z "$result" ];
-        then echo "FAIL"
-    elif [ $result == *"Traceback"* ];
-        then echo "ERROR"
+    if [ -z "$result" ]; then
+        echo "FAIL"
+    elif [[ $result == *"Traceback"* ]]; then
+        echo "ERROR"
     else
         echo $result
     fi
