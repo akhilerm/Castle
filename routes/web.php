@@ -25,10 +25,17 @@ Route::post('/editor', 'EditorController@index')->name('editor');
 
 Route::post('/timeout','HomeController@timeout')->name('timeout');
 
-/**
- * Route just for test
- */
+Route::get('verify/{token}',function ($token){
 
-Route::get('/test',function (){
-    return \Illuminate\Support\Facades\Auth::id();
-});
+    $token_data = \App\Token::where('token', $token)->first();
+    $user_id = $token_data['user_id'];
+    $token_data->delete();
+
+    $user = \App\Models\user::find($user_id);
+    $user['active'] = 1;
+    $user->save();
+
+    \Illuminate\Support\Facades\Session::flash('message', 'Your account has been activated please login');
+    return redirect('login');
+
+})->middleware('guest');
