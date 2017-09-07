@@ -13,7 +13,7 @@ import solution
 	Resource/Time limit errors will be produced from docker container'''
 
 #opening and parsing test cases
-with open ("/tmp/answer/question_test_file") as file: # change after development finishes
+with open ("") as file: # change after development finishes
     cases=file.readlines();
 cases = [x.strip() for x in cases]
 cases = [ast.literal_eval(x) for x in cases]

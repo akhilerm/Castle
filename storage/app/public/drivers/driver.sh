@@ -1,17 +1,25 @@
 #! /bin/sh
 
 lang=$1
+question=$2
+
+cd /tmp/driver
 
 case $lang in
     JAVA )
     ;;
+
     PYTHON )
     cp ../user/solution.py solution.py
-    cp ../answer/
+    cp ../answer/$question answer
+    result=$(timeout 20 python driver.py answer 2>&1)
+    if [ -z "$result" ];
+        then echo "FAIL"
+    elif [[ $result == *"Traceback"* ]];
+        then echo "ERROR"
+    else
+        echo $result
+    fi
     ;;
+
 esac
-
-if
-
-result=$(timeout 20 python solution.py  2>&1)
-echo "HI" $result "BY"
