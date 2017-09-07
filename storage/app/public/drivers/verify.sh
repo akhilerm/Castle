@@ -14,12 +14,12 @@ elif [[ $filename == *".py"* ]];
 	then lang="PYTHON"
 fi
 
-result=$(docker run --rm -v $workdir/users/$userid/$question:/tmp/user:ro -v $workdir/answers:/tmp/answer:ro python:df /tmp/driver/driver.sh ${lang} ${question})
+result=$(docker run --rm -v $workdir/users/$userid/$question:/tmp/user:ro -v $workdir/answers:/tmp/answer:ro -v $workdir/drivers:/tmp/driver cont:df /tmp/driver/driver.sh ${lang} ${question})
 
-if [ $result == "FAIL" ];
+if [[ $result == "FAIL" ]];
     then echo "FAIL"
     echo "Resource limit reached"
-elif [ $result == "ERROR" ];
+elif [[ $result == "ERROR" ]];
     then echo "FAIL"
     echo "Error in file " $filename
 else

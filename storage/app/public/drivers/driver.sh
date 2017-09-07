@@ -12,7 +12,7 @@ case $lang in
     PYTHON )
     cp ../user/solution.py solution.py
     cp ../answer/$question answer
-    result=$(timeout 20 python driver.py answer 2>&1)
+    result=$(timeout 20 python driver.py  2>&1)
     if [ -z "$result" ];
         then echo "FAIL"
     elif [[ $result == *"Traceback"* ]];
@@ -20,6 +20,8 @@ case $lang in
     else
         echo $result
     fi
+    rm solution.py
+    rm answer
     ;;
 
 esac
