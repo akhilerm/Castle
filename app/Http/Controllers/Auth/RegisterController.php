@@ -7,10 +7,6 @@ use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
-use App\Token;
 
 
 class RegisterController extends Controller
@@ -80,32 +76,7 @@ class RegisterController extends Controller
             'phone' => $data['phone']
         ]);
 
-        //calculate path for the user if the dir already exists (unlikely) delete it and create new dir
-        $default = 'public/users/default';
-        $user_id = $user['id'];
-        $user_dir = "public/users/$user_id";
-        if (Storage::has($user_dir)){
-            Storage::deleteDirectory($user_dir);
-        }
-
-        //Find all files in default  dir and make a copy of it to main folder
-        $files = Storage::allFiles($default);
-        foreach ($files as $file){
-            $new_file = strtr($file, [ $default => $user_dir ]);
-            Storage::copy($file, $new_file);
-        }
-
-        //Make Token and send mail to  user for verifying the email.
-        $token = Hash::make($user['email'].$user['remember_token']);
-        $token=strtr($token, ['/' => '']);
-        $link = URL::to('/').'/verify/'.$token;
-
-        event(new UserRegistered($user, $link));
-
-        $save_token = new Token;
-        $save_token->token = $token;
-        $save_token->user_id = $user['id'];
-        $save_token->save();
+        event(new UserRegistered($user));
 
         return $user;
 

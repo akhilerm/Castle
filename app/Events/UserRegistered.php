@@ -22,12 +22,10 @@ class UserRegistered
      */
 
     public $user;
-    public $link;
 
-    public function __construct(User $user, $link)
+    public function __construct(User $user)
     {
         $this->user = $user;
-        $this->link = $link;
     }
 
     /**
