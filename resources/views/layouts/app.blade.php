@@ -22,12 +22,12 @@
     @show
 
 </head>
-<body>
+<body style="background-color: #161e21">
 <nav class="grey darken-3">
                 <div class="nav-wrapper">
 
             <!-- Branding Image -->
-                    <a class="navbar-brand" style="position: absolute; left: 50%; font-weight: bolder; font-size: 25px; color: #00979c" href="{{ url('/') }}">
+                    <a class="navbar-brand" style="position: absolute; left: 47.5%; font-weight: bolder; font-size: 25px; color: #00979c" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
 
