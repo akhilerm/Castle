@@ -23,10 +23,11 @@
 
 </head>
 <body>
-        <nav class="navbar">
+<nav class="grey darken-3">
+                <div class="nav-wrapper">
 
             <!-- Branding Image -->
-            <a class="navbar-brand" href="{{ url('/') }}">
+                    <a class="navbar-brand" style="position: absolute; left: 50%; font-weight: bolder; font-size: 25px; color: #00979c" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
 
@@ -39,6 +40,7 @@
                         <li><a href="{{ route('register') }}">Register</a></li>
                     </ul>
                 @endif
+                </div>
         </nav>
         <!--Content-->
         @yield('content')

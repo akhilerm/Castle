@@ -170,7 +170,7 @@
                     },
                     greetings: 'Mounting [[;#3FBDB8;]/home/<?php echo Auth::user()['name']; ?>...]',
                     name: 'js',
-                    height: 200,
+                    height: '80vh',
                     prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
                 });
             });
@@ -179,14 +179,16 @@
 
     </script>
 
-@endsection>
+@endsection
 
 @section('content')
 
-    <div class="container">
+<header></header>
+    <main>
+        <div class="row">
 
         <!--Terminal-->
-        <div class="row">
+            <div class="col s8">
             <div id="term">
             </div>
         </div>
@@ -197,26 +199,37 @@
         </div>
 
         <!--Editor-->
-        <div class="editor row">
-
-
+            <div class="col s4 editor">
+                <div class="row">
+                    <h5 class="headEdi center">Editor</h5>
+                </div>
             <div class="row input-block">
                     <textarea id='input'>
                      </textarea>
             </div>
 
             <div class="navigation row">
-                <div class="col s9">
-                    <h5 class="white-text">File name</h5>
+                <div class="col s10">
+                    <h5 class="white-text" style="margin-left:30px;font-weight: light; font-size: 16px;">File</h5>
                 </div>
                 <div class="col s1" id="save">
-                    <i class="material-icons">save</i>
+                    <i class="material-icons" style="margin-top:10px; margin-right: 5px;">save</i>
                 </div>
                 <div class="col s1" id="close">
-                    <i class="material-icons">close</i>
+                    <i class="material-icons" style="margin-top:10px; margin-right: 5px;">close</i>
                 </div>
             </div>
 
         </div>
     </div>
+    </main>
+    <footer class="page-footer grey darken-3">
+
+          <div class="footer-copyright">
+            <div class="container">
+            © 2014 Copyright Text
+            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            </div>
+          </div>
+        </footer>
 @endsection
