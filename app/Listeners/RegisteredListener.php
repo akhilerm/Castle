@@ -49,7 +49,7 @@ class RegisteredListener implements ShouldQueue
 
         //Make Token and send mail to  user for verifying the email.
         $token = Hash::make($event->user->id).$event->user->name;
-        strtr($token, ['/' => '']);
+        $token = strtr($token, ['/' => '']);
         $link = URL::to('/').'/verify/'.$token;
 
         Mail::send(['text'=> 'mail'], ['link'=> $link], function ($message) use ($event){
