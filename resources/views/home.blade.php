@@ -188,13 +188,13 @@
         <div class="row">
 
         <!--Terminal-->
-            <div class="col s8">
+        <div class="col s8">
             <div id="term">
             </div>
         </div>
 
         <!--Countdown timer-->
-        <div class="row">
+       <div class="">
             <span id="time">Test</span>
         </div>
 
