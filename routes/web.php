@@ -19,11 +19,15 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::post('/shell','ShellContoller@shell')->name('shell');
+Route::post('/shell', 'ShellContoller@shell')->name('shell');
 
 Route::post('/editor', 'EditorController@index')->name('editor');
 
-Route::post('/timeout','HomeController@timeout')->name('timeout');
+Route::post('/timeout', 'HomeController@timeout')->name('timeout');
+
+Route::get('/dashboard', 'DashController@index')->name('dashboard');
+
+Route::post('/add', 'DashController@add')->name('add');
 
 Route::get('verify/{token}',function ($token){
 
