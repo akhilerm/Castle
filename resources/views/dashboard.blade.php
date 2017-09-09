@@ -43,6 +43,16 @@
                 @endif
             </div>
 
+            <div class="">
+                <label for="time" class="">Sub level</label>
+                <input id="time" type="number" class="" name="time" required>
+                @if ($errors->has('time'))
+                    <span class="">
+                        <strong>{{ $errors->first('time') }}</strong>
+                    </span>
+                @endif
+            </div>
+
             <div class="file-field input-field">
                 <div class="btn">
                     <span>Constraints</span>
@@ -57,6 +67,16 @@
                 <div class="btn">
                     <span>Read Me</span>
                     <input type="file" name="readme" required>
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>Answers</span>
+                    <input type="file" name="answers" required>
                 </div>
                 <div class="file-path-wrapper">
                     <input class="file-path validate" type="text">
