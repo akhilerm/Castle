@@ -4,8 +4,10 @@
 
 <div class="container">
     <div class="row">
-        <div class="col s8 offset-s2">
+        <div class="col s4 offset-s4" style="border: 2px white solid; margin-top: 15px; padding: 20px;">
 
+        <h5 style="color: #00979c; text-align: center;margin-bottom: 10px;">Register</h5>
+        <hr style="margin-bottom: 15px;">
             <form class="form-horizontal" method="POST" action="{{ route('register') }}">
                 {{ csrf_field() }}
                     <div class="">
