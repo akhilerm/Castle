@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col s4 offset-s4" style="border: 2px white solid; margin-top: 140px; padding: 20px;">
             <div class="panel panel-default">
                 <div class="panel-heading">Reset Password</div>
 
@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="form-group" >
-                            <div class="col s4 offset-4">
+                            <div >
                                 <button type="submit" class="btn btn-primary">
                                     Reset Password
                                 </button>

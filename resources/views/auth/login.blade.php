@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="">
-                    <button type="submit" class="btn" style="background-color: #00979c">
+                    <button type="submit" class="btn" style="background-color:#00979c">
                         Login
                     </button>
                     <a class="" style="color: #00979c" href="{{ route('password.request') }}">

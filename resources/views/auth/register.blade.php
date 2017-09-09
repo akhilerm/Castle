@@ -12,7 +12,7 @@
                 {{ csrf_field() }}
                     <div class="">
                             <label for="name" class="">Name</label>
-                            <input id="name" type="text" class="" name="name" value="{{ old('name') }}" required autofocus>
+                            <input id="name" type="text" class="" style="color: white;" name="name" value="{{ old('name') }}" required autofocus>
                             @if ($errors->has('name'))
                                 <span class="">
                                     <strong>{{ $errors->first('name') }}</strong>
@@ -22,7 +22,7 @@
 
                     <div class="">
                         <label for="email" class="">E-Mail Address</label>
-                        <input id="email" type="email" class="" name="email" value="{{ old('email') }}" required>
+                        <input id="email" type="email" class=""  style="color: white;" name="email" value="{{ old('email') }}" required>
                         @if ($errors->has('email'))
                             <span class="">
                                 <strong>{{ $errors->first('email') }}</strong>
@@ -32,7 +32,7 @@
 
                     <div class="">
                         <label for="password" class="">Password</label>
-                        <input id="password" type="password" class="" name="password" required>
+                        <input id="password" type="password" class="" style="color: white;" name="password" required>
                         @if ($errors->has('password'))
                             <span class="">
                                 <strong>{{ $errors->first('password') }}</strong>
@@ -42,12 +42,12 @@
 
                     <div class="">
                         <label for="password-confirm" class="col-md-4 control-label">Confirm Password</label>
-                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
+                        <input id="password-confirm" type="password" class="form-control" style="color: white;" name="password_confirmation" required>
                     </div>
 
                     <div class="">
                         <label for="date" class="">Date Of Birth</label>
-                        <input id="date" type="date" class="" name="date" required>
+                        <input id="date" type="date" class="" style="color: white;" name="date" required>
                         @if ($errors->has('date'))
                             <span class="">
                                 <strong>{{ $errors->first('date') }}</strong>
@@ -57,7 +57,7 @@
 
                     <div class="">
                         <label for="country" class="">Country</label>
-                        <input id="country" type="text" class="" name="country" value="{{ old('country') }}" required>
+                        <input id="country" type="text" class="" style="color: white;" name="country" value="{{ old('country') }}" required>
                         @if ($errors->has('country'))
                             <span class="">
                                 <strong>{{ $errors->first('country') }}</strong>
@@ -67,7 +67,7 @@
 
                     <div class="">
                         <label for="phone" class="">Phone</label>
-                        <input id="phone" type="text" class="" name="phone" value="{{ old('phone') }}" required>
+                        <input id="phone" type="text" class=""  style="color: white;" name="phone" value="{{ old('phone') }}" required>
                         @if ($errors->has('phone'))
                             <span class="">
                                 <strong>{{ $errors->first('phone') }}</strong>
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="">
-                        <button type="submit" class="btn" id="button">
+                        <button type="submit" class="btn" style="background-color:#00979c" id="button">
                                     Register
                         </button>
                     </div>
