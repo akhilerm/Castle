@@ -185,16 +185,16 @@
 
 <header></header>
     <main>
-        <div class="row">
-
+        
+       
         <!--Terminal-->
-        <div class="col s8">
+        <div class="col s7">
             <div id="term">
             </div>
         </div>
 
         <!--Countdown timer-->
-       <div class="" style="display: inline;color: white;position: absolute;top: 74px;right: 10px;">
+       <div class="" style="display: inline; position: absolute; left: 20px; bottom: 75px; font-weight: bolder; color: #00979c">
             <span id="time">Test</span>
         </div>
 

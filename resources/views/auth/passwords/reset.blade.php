@@ -74,3 +74,6 @@
     </div>
 </div>
 @endsection
+<div style="position: absolute; left: 0; bottom: 0; width:8.3333%; height: 11.25vh; background-color: white">
+    
+</div>
