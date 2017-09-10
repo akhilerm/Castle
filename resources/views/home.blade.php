@@ -194,7 +194,7 @@
         </div>
 
         <!--Countdown timer-->
-       <div class="">
+       <div class="" style="display: inline;color: white;position: absolute;top: 74px;right: 10px;">
             <span id="time">Test</span>
         </div>
 
