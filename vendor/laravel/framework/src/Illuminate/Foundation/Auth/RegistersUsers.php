@@ -34,7 +34,7 @@ trait RegistersUsers
         event(new Registered($user = $this->create($request->all())));
 
         //Flash in seesion to show in login page
-        $request->session()->flash('message', 'An email has been sent to your email account to verify email(check spam folder).');
+        $request->session()->flash('message', 'A verification mail has been sent to your email.');
 
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());
