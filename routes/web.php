@@ -31,7 +31,7 @@ Route::post('/add', 'DashController@add')->name('add');
 
 Route::get('verify/{token}',function ($token){
 
-    $token_data = \App\Token::where('token', $token)->first();
+    $token_data = \App\Token::where('token', $token)->firstOrFail();;
     $user_id = $token_data['user_id'];
     $token_data->delete();
 
