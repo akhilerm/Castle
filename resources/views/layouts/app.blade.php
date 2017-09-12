@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 
     @section('css')
     @show
@@ -22,7 +23,7 @@
     @show
 
 </head>
-<body style="background-color: #161e21">
+<body style="background-color: #161e21; font-family: 'VT323', monospace!important;">
 <div class="row">
 <div class="col s1 white" style="height:89.75vh; ">
                 <div class="nav-wrapper">
