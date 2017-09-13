@@ -12,7 +12,7 @@
                 {{ csrf_field() }}
                     <div class="row">
                     <div class="col s6">
-                            <label for="name" class="" style="font-size: 20px;">Name</label>
+                            <label for="name" class="" style="font-size: 20px;">Username</label>
                             <input id="name" type="text" class="" style="color: white;" name="name" value="{{ old('name') }}" required autofocus>
                             @if ($errors->has('name'))
                                 <span class="">
