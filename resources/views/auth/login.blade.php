@@ -5,7 +5,7 @@
 <div class="container">
     <div class="row">
 
-        <div class="col s8 offset-s2">
+        <div class="col s4 offset-s4" style="border: 2px white solid; margin-top: 140px; padding: 20px;">
             <p>
                 @if(\Illuminate\Support\Facades\Session::has('message'))
                     {{ \Illuminate\Support\Facades\Session::get('message') }}
@@ -17,7 +17,7 @@
 
                 <div class="">
                     <label for="name" class="col s4">username</label>
-                    <input id="name" type="text" class="" name="name" value="{{ old('name') }}" required autofocus>
+                    <input  id="name" type="text" class="" name="name" style="color: white;" value="{{ old('name') }}" required autofocus>
                     @if ($errors->has('name'))
                         <span class="">
                             <strong>{{ $errors->first('name') }}</strong>
@@ -27,7 +27,7 @@
 
                 <div class="">
                     <label for="password" class="col s4">Password</label>
-                    <input id="password" type="password" class="" name="password" required>
+                    <input id="password" type="password" class="" style="color: white;" name="password" required>
                     @if ($errors->has('password'))
                         <span class="">
                                     <strong>{{ $errors->first('password') }}</strong>
@@ -43,10 +43,10 @@
                 </div>
 
                 <div class="">
-                    <button type="submit" class="btn">
+                    <button type="submit" class="btn" style="background-color:#00979c">
                         Login
                     </button>
-                    <a class="" href="{{ route('password.request') }}">
+                    <a class="" style="color: #00979c" href="{{ route('password.request') }}">
                         Forgot Your Password?
                     </a>
                 </div>
@@ -54,6 +54,9 @@
 
         </div>
     </div>
+</div>
+<div style="position: absolute; left: 0; bottom: 0; width:8.3333%; height: 11.25vh; background-color: white">
+    
 </div>
 
 @endsection

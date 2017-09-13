@@ -1,12 +1,23 @@
 
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+       flex: 1 0 auto;
+}
+
 .editor{
-    background-color: #B084CC;
-    height:500px;
-    margin:3vh;
+       background-color: #00979c;
+       height:86vh;
+
 }
 
 .navigation{
-    background-color: #B084CC;
+    background-color: #00979c;
+    color: white;
     width: 100%;
 }
 
@@ -27,10 +38,26 @@ i{
     height: 100%;
     width: 100%;
     resize: none;
-    color: #6B5E62;
-    background-color: #d6e9c6;
+    color: #000;
+    background-color: #fff;
+
+
 }
 
 .row .col{
     padding: 0px;
 }
+
+.page-footer{
+    padding-top: 16px;
+}
+
+.headEdi{
+    color: white;
+    font-size: 18px;
+    font-weight: light;
+}
+.input-field input[type=text]:focus {
+     border-bottom: 1px solid #000;
+     box-shadow: 0 1px 0 0 #000;
+   }

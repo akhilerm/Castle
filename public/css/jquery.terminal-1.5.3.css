@@ -395,7 +395,7 @@
 @supports (--css: variables) {
     .terminal, .cmd {
         color: var(--color, #aaa);
-        background-color: var(--background, #000);
+        background-color: var(--background, #161e21);
     }
     .terminal, .cmd, .terminal .terminal-output div div, .cmd .prompt {
         font-size: calc(var(--size, 1) * 12px);
