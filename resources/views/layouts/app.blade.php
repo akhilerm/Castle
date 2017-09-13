@@ -29,7 +29,7 @@
                 <div class="nav-wrapper">
 
             <!-- Branding Image -->
-                    <a class="navbar-brand" style="position: absolute; left: 20px; top: 20px; font-weight: bolder; font-size: 22px; color: #00979c" href="{{ url('/') }}">
+                    <a class="navbar-brand" style="position: absolute; left: 20px; top: 20px; font-weight: bolder; font-size:30px; color: #00979c" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
 
@@ -37,9 +37,9 @@
             <!-- Right Side Of Navbar -->
             <!-- Authentication Links -->
                 @if (Auth::guest())
-                    <ul id="nav-mobile" class="" style="position: absolute; left: 20px; top: 40px;">
-                        <li><a href="{{ route('login') }}">Login</a></li>
-                        <li><a href="{{ route('register') }}">Register</a></li>
+                    <ul id="nav-mobile" class="" style="position: absolute; left: 26px; top: 50px; font-size: 18px;">
+                        <li><a style="color: #00979c;" href="{{ route('login') }}">Login</a></li>
+                        <li><a style="color: #00979c;" href="{{ route('register') }}">Register</a></li>
                     </ul>
                 @endif
                 </div>

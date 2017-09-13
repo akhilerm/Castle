@@ -16,7 +16,7 @@
                 {{ csrf_field() }}
 
                 <div class="">
-                    <label for="name" class="col s4">username</label>
+                    <label for="name" class="col s4" style="font-size: 20px;">username</label>
                     <input  id="name" type="text" class="" name="name" style="color: white;" value="{{ old('name') }}" required autofocus>
                     @if ($errors->has('name'))
                         <span class="">
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="">
-                    <label for="password" class="col s4">Password</label>
+                    <label for="password" class="col s4" style="font-size: 20px;">Password</label>
                     <input id="password" type="password" class="" style="color: white;" name="password" required>
                     @if ($errors->has('password'))
                         <span class="">

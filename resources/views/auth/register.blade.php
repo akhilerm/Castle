@@ -12,7 +12,7 @@
                 {{ csrf_field() }}
                     <div class="row">
                     <div class="col s6">
-                            <label for="name" class="">Name</label>
+                            <label for="name" class="" style="font-size: 20px;">Name</label>
                             <input id="name" type="text" class="" style="color: white;" name="name" value="{{ old('name') }}" required autofocus>
                             @if ($errors->has('name'))
                                 <span class="">
@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="col s6">
-                        <label for="email" class="">E-Mail Address</label>
+                        <label for="email" class="" style="font-size: 20px;">E-Mail</label>
                         <input id="email" type="email" class=""  style="color: white;" name="email" value="{{ old('email') }}" required>
                         @if ($errors->has('email'))
                             <span class="">
@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="col s6">
-                        <label for="password" class="">Password</label>
+                        <label for="password" class="" style="font-size: 20px;">Password</label>
                         <input id="password" type="password" class="" style="color: white;" name="password" required>
                         @if ($errors->has('password'))
                             <span class="">
@@ -42,12 +42,12 @@
                     </div>
 
                     <div class="col s6">
-                        <label for="password-confirm" class="col-md-4 control-label">Confirm Password</label>
+                        <label for="password-confirm" class="col-md-4 control-label" style="font-size: 20px;">Confirm Password</label>
                         <input id="password-confirm" type="password" class="form-control" style="color: white;" name="password_confirmation" required>
                     </div>
 
                     <div class="col s6">
-                        <label for="date" class="">Date Of Birth</label>
+                        <label for="date" class="" style="font-size: 20px;">Date Of Birth</label>
                         <input id="date" type="date" class="" style="color: white;" name="date" required>
                         @if ($errors->has('date'))
                             <span class="">
@@ -57,7 +57,7 @@
                     </div>
 
                     <div class="col s6">
-                        <label for="country" class="">Country</label>
+                        <label for="country" class="" style="font-size: 20px;">Country</label>
                         <input id="country" type="text" class="" style="color: white;" name="country" value="{{ old('country') }}" required>
                         @if ($errors->has('country'))
                             <span class="">
@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="col s6">
-                        <label for="phone" class="">Phone</label>
+                        <label for="phone" class="" style="font-size: 20px;">Phone</label>
                         <input id="phone" type="text" class=""  style="color: white;" name="phone" value="{{ old('phone') }}" required>
                         @if ($errors->has('phone'))
                             <span class="">
@@ -77,7 +77,7 @@
                     </div>
 
                     <div class="col s12 center">
-                        <button type="submit" class="btn" style="background-color:#00979c" id="button">
+                        <button type="submit" class="btn" style="background-color:#00979c;font-size: 20px;" id="button">
                                     Register
                         </button>
                     </div>
