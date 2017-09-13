@@ -67,27 +67,23 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
+            <div class="content">
+            <div class="title m-b-md">
+                Castle
+            </div>
             @if (Route::has('login'))
-                <div class="top-right links">
+            <div class="links" style="color: white">
                     @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
+                <p><a style="color: white;" href="{{ url('/home') }}">Terminal</a></p>
                     @else
-                        
+                <p>Been here before?
+                    <a style="color: white;" href="{{ url('/login') }}">Login</a></p>
+                <p>or
+                    <a style="color: white;" href="{{ url('/register') }}">Register</a></p>
                     @endif
                 </div>
             @endif
-
-            <div class="content">
-                <div class="title m-b-md">
-                    Castle
-                </div>
-
-                <div class="links" style="color: white">
-                <p>Been here before?
-                   <a style="color: white;" href="{{ url('/login') }}">Login</a></p>
-                   <p>or
-                        <a style="color: white;" href="{{ url('/register') }}">Register</a></p>
-                </div>
+                
             </div>
         </div>
         <a href="https://github.com/akhilerm/Castle"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
