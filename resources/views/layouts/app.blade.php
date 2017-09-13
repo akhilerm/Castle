@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 
     @section('css')
     @show
@@ -22,11 +23,13 @@
     @show
 
 </head>
-<body>
-        <nav class="navbar">
+<body style="background-color: #161e21; font-family: 'VT323', monospace!important;">
+<div class="row">
+<div class="col s1 white" style="height:89.75vh; ">
+                <div class="nav-wrapper">
 
             <!-- Branding Image -->
-            <a class="navbar-brand" href="{{ url('/') }}">
+                    <a class="navbar-brand" style="position: absolute; left: 20px; top: 20px; font-weight: bolder; font-size:30px; color: #00979c" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}
             </a>
 
@@ -34,12 +37,13 @@
             <!-- Right Side Of Navbar -->
             <!-- Authentication Links -->
                 @if (Auth::guest())
-                    <ul id="nav-mobile" class="right hide-on-med-and-down">
-                        <li><a href="{{ route('login') }}">Login</a></li>
-                        <li><a href="{{ route('register') }}">Register</a></li>
+                    <ul id="nav-mobile" class="" style="position: absolute; left: 26px; top: 50px; font-size: 18px;">
+                        <li><a style="color: #00979c;" href="{{ route('login') }}">Login</a></li>
+                        <li><a style="color: #00979c;" href="{{ route('register') }}">Register</a></li>
                     </ul>
                 @endif
-        </nav>
+                </div>
+        </div>
         <!--Content-->
         @yield('content')
 

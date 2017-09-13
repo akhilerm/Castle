@@ -8,14 +8,14 @@
         <title>Castle</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+       <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 
         <!-- Styles -->
         <style>
             html, body {
-                background-color: #fff;
+                background-color: #161e21;
                 color: #636b6f;
-                font-family: 'Raleway', sans-serif;
+                font-family: 'VT323', monospace;
                 font-weight: 100;
                 height: 100vh;
                 margin: 0;
@@ -47,6 +47,7 @@
 
             .title {
                 font-size: 84px;
+                color: #00979c;
             }
 
             .links > a {
@@ -71,8 +72,7 @@
                     @if (Auth::check())
                         <a href="{{ url('/home') }}">Home</a>
                     @else
-                        <a href="{{ url('/login') }}">Login</a>
-                        <a href="{{ url('/register') }}">Register</a>
+                        
                     @endif
                 </div>
             @endif
@@ -82,14 +82,14 @@
                     Castle
                 </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                <div class="links" style="color: white">
+                <p>Have been here before? then
+                   <a style="color: white;" href="{{ url('/login') }}">Login</a></p>
+                   <p>or
+                        <a style="color: white;" href="{{ url('/register') }}">Register</a></p>
                 </div>
             </div>
         </div>
+        <a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
     </body>
 </html>
