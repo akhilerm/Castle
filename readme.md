@@ -59,6 +59,26 @@ Contributions are invited to support more programming languages and also documen
         │   └── solution.py
         └── readme.txt
 ```
+### TO run the application
+
+fork/clone this application
+
+cd to the root directory of the project
+
+Change the .env file , DB name, username, password, mail_id to use, app key etc
+
+Now execute the following commands
+
+`php artisan config:clear`
+
+`php artisan config:cache`
+
+`php artisan queue:listen & `
+
+`php artisan serve`
+
+The development server will start `localhost:8000` and your application will be live at that address.
+
 ### Adding new languages
 
 install the language in the docker container
