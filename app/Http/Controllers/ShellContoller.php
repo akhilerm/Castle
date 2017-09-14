@@ -569,7 +569,7 @@ class ShellContoller extends Controller
                 }
             } else {
 
-                $msg = 'File not editable';
+                $msg = '[[;#FF0000;]File not editable]';
                 $sts = false;
                 $file = '';
 
