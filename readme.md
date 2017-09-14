@@ -1,4 +1,5 @@
-# Castle
+# Castle     
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 An open source implementation of the Google Foobar challenge. The game is modelled in such a way that it is similar in almost every way to the google foobar challenge.
 User has to navigate using terminal commands. Solution can be submitted currently in python. The code will be executed in a docker container and will be checked against a set of test cases.
