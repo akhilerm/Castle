@@ -1,4 +1,4 @@
-@extends('layouts.app')
+ @extends('layouts.app')
 
 @section('content')
 
@@ -6,7 +6,7 @@
     <div class="row">
 
         <div class="col s4 offset-s4" style="border: 2px white solid; margin-top: 140px; padding: 20px;">
-            <p>
+            <p style="color: white">
                 @if(\Illuminate\Support\Facades\Session::has('message'))
                     {{ \Illuminate\Support\Facades\Session::get('message') }}
                 @endif
