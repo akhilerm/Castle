@@ -67,7 +67,7 @@ cd to the root directory of the project
 
 You need to build the docker image so that containers can be started using this image and code can be executed safely. TO build the docker image from the root directory `docker build -t cont:f .`
 
-Change the .env file , DB name, username, password, mail_id to use, app key etc
+Rename `.env.sample` to `.env`. Change the following in `.env` file - DB name, username, password, mail_id to use, app key etc
 
 Now execute the following commands
 
