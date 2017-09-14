@@ -4,6 +4,11 @@ An open source implementation of the Google Foobar challenge. The game is modell
 User has to navigate using terminal commands. Solution can be submitted currently in python. The code will be executed in a docker container and will be checked against a set of test cases.
 Once a question is completed, the user can request for new challenge.
 
+
+Uses [jquery terminal](https://github.com/jcubic/jquery.terminal) for creating the terminal interface. [Laravel]( https://github.com/laravel/laravel) framework is used to build the application. 
+
+Contributions are invited to support more programming languages and also documentation.
+
 3 folders where question/answers are stored. In ./storage/app/public/
 ```
 ./storage/app/public/
