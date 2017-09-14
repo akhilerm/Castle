@@ -7,6 +7,12 @@ use Illuminate\Support\Facades\Storage;
 
 class EditorController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index(Request $request){
         $inputs = $request->all();
 

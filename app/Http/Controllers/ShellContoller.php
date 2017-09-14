@@ -15,6 +15,11 @@ class ShellContoller extends Controller
 {
     //
 
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function shell()
     {
         if (Request::ajax()) {

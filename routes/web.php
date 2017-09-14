@@ -43,3 +43,10 @@ Route::get('verify/{token}',function ($token){
     return redirect('login');
 
 })->middleware('guest');
+
+
+Route::get('/mobile', function (\Illuminate\Http\Request $request){
+    return  view('mobileError');
+});
+
+
