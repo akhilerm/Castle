@@ -46,16 +46,6 @@
                         <input id="password-confirm" type="password" class="form-control" style="color: white;" name="password_confirmation" required>
                     </div>
 
-                    <!--<div class="col s6">
-                        <label for="date" class="" style="font-size: 20px;">Date Of Birth</label>
-                        <input id="date" type="date" class="" style="color: white;" name="date" required>
-                        @if ($errors->has('date'))
-                            <span class="">
-                                <strong style="color: white">{{ $errors->first('date') }}</strong>
-                            </span>
-                        @endif
-                    </div>-->
-
                     <div class="col s6">
                         <label for="country" class="" style="font-size: 20px;">Country</label>
                         <input id="country" type="text" class="" style="color: white;" name="country" value="{{ old('country') }}" required>
