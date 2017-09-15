@@ -24,7 +24,7 @@
 
                                 @if ($errors->has('email'))
                                     <span class="help-block" style="color: white; padding: 5px;">
-                                        <strong>{{ $errors->first('email') }}</strong>
+                                        <strong style="color: white;">{{ $errors->first('email') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -32,7 +32,7 @@
 
                         <div class="form-group" >
                             <div>
-                                <button type="submit" class="btn btn-primary" style="font-size: 20px;">
+                                <button type="submit" class="btn btn-primary" style="font-size: 20px; style="color: white"">
                                     Send Password Reset Link
                                 </button>
                             </div>
