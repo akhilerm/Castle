@@ -6,7 +6,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>Castle</title>
+        <script>
+            //To Check if Mobile
+            var isMobile = {
+                Android: function() {
+                    return navigator.userAgent.match(/Android/i);
+                },
+                BlackBerry: function() {
+                    return navigator.userAgent.match(/BlackBerry/i);
+                },
+                iOS: function() {
+                    return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+                },
+                Opera: function() {
+                    return navigator.userAgent.match(/Opera Mini/i);
+                },
+                Windows: function() {
+                    return navigator.userAgent.match(/IEMobile/i);
+                },
+                any: function() {
+                    return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+                }
+            };
 
+            if (isMobile.any()){
+                window.location.replace("/mobile");
+            }
+        </script>
         <!-- Fonts -->
        <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 

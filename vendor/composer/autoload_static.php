@@ -358,6 +358,7 @@ class ComposerStaticInit8551cd0d5ace59ee47d46df485b5aa91
         'DeepCopy\\TypeFilter\\Spl\\SplDoublyLinkedList' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/Spl/SplDoublyLinkedList.php',
         'DeepCopy\\TypeFilter\\TypeFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
         'DeepCopy\\TypeMatcher\\TypeMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
+        'DeleteDobFromUsersTable' => __DIR__ . '/../..' . '/database/migrations/2017_09_14_132432_delete_dob_from_users_table.php',
         'Doctrine\\Common\\Inflector\\Inflector' => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Common/Inflector/Inflector.php',
         'Doctrine\\Common\\Lexer\\AbstractLexer' => __DIR__ . '/..' . '/doctrine/lexer/lib/Doctrine/Common/Lexer/AbstractLexer.php',
         'Doctrine\\Instantiator\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator/Exception/ExceptionInterface.php',

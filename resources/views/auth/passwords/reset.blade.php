@@ -9,7 +9,7 @@
 
                 <div class="panel-body">
                     @if (session('status'))
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" style="color: white">
                             {{ session('status') }}
                         </div>
                     @endif
@@ -27,7 +27,7 @@
 
                                 @if ($errors->has('email'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
+                                        <strong style="color: white">{{ $errors->first('email') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -41,7 +41,7 @@
 
                                 @if ($errors->has('password'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
+                                        <strong style="color: white">{{ $errors->first('password') }}</strong>
                                     </span>
                                 @endif
                             </div>
@@ -54,7 +54,7 @@
 
                                 @if ($errors->has('password_confirmation'))
                                     <span class="help-block">
-                                        <strong>{{ $errors->first('password_confirmation') }}</strong>
+                                        <strong style="color: white">{{ $errors->first('password_confirmation') }}</strong>
                                     </span>
                                 @endif
                             </div>
