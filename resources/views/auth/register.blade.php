@@ -12,7 +12,7 @@
                 {{ csrf_field() }}
                     <div class="row">
                     <div class="col s6">
-                            <label for="name" class="" style="font-size: 20px;">Name</label>
+                            <label for="name" class="" style="font-size: 20px;">Username</label>
                             <input id="name" type="text" class="" style="color: white;" name="name" value="{{ old('name') }}" required autofocus>
                             @if ($errors->has('name'))
                                 <span class="">
@@ -44,16 +44,6 @@
                     <div class="col s6">
                         <label for="password-confirm" class="col-md-4 control-label" style="font-size: 20px;">Confirm Password</label>
                         <input id="password-confirm" type="password" class="form-control" style="color: white;" name="password_confirmation" required>
-                    </div>
-
-                    <div class="col s6">
-                        <label for="date" class="" style="font-size: 20px;">Date Of Birth</label>
-                        <input id="date" type="date" class="" style="color: white;" name="date" required>
-                        @if ($errors->has('date'))
-                            <span class="">
-                                <strong style="color: white">{{ $errors->first('date') }}</strong>
-                            </span>
-                        @endif
                     </div>
 
                     <div class="col s6">
