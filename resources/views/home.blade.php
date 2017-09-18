@@ -69,7 +69,7 @@
                                 countDownDate = 0;
                                 clock.text("00:00:00");
                                 clock.hide();
-                                terminal.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ ');
+                                terminal.set_prompt('<?php echo Auth::user()['name'] ?>@Castle:<?php echo '~';?>$ ');
                                 fileName = false;
                             }
                         }).fail(function (response) {
@@ -197,7 +197,7 @@
                     greetings: 'Mounting [[;#3FBDB8;]/home/<?php echo Auth::user()['name']; ?>...]',
                     name: 'js',
                     height: '80vh',
-                    prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php echo session('pwd')?>$ '
+                    prompt: '<?php echo Auth::user()['name'] ?>@Castle:<?php if (session('pwd') !== '~') echo '~/'.session('pwd'); else echo '~';?>$ '
                 });
             });
 
