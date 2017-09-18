@@ -20,7 +20,7 @@
                     <input  id="name" type="text" class="" name="name" style="color: white;" value="{{ old('name') }}" required autofocus>
                     @if ($errors->has('name'))
                         <span class="">
-                            <strong>{{ $errors->first('name') }}</strong>
+                            <strong style="color: white">{{ $errors->first('name') }}</strong>
                         </span>
                     @endif
                 </div>
@@ -30,7 +30,7 @@
                     <input id="password" type="password" class="" style="color: white;" name="password" required>
                     @if ($errors->has('password'))
                         <span class="">
-                                    <strong>{{ $errors->first('password') }}</strong>
+                                    <strong style="color: white">{{ $errors->first('password') }}</strong>
                                 </span>
                     @endif
                 </div>
