@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\UserRegistered;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Mail\Verify;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -52,9 +52,7 @@ class RegisteredListener implements ShouldQueue
         $token = strtr($token, ['/' => '']);
         $link = URL::to('/').'/verify/'.$token;
 
-        Mail::send(['text'=> 'mail'], ['link'=> $link], function ($message) use ($event){
-            $message->to( $event->user->email, $event->user->name)->subject('Verification Email');
-        });
+        Mail::to($event->user->email)->send(new Verify($link));
 
         $save_token = new Token;
         $save_token->token = $token;
