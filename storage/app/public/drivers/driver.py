@@ -23,12 +23,12 @@ number_of_cases = len(cases)/2
 
 for i in range(number_of_cases):
     if type(cases[i]) is tuple:
-        if cases[number_of_cases+i] == solution.main(*cases):
+        if cases[number_of_cases+i] == solution.answer(*cases):
             s+="1"
         else:
             s+="0"
     else:
-        if cases[number_of_cases+i] == solution.main(cases[i]):
+        if cases[number_of_cases+i] == solution.answer(cases[i]):
             s+="1"
         else:
             s+="0"

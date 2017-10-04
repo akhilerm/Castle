@@ -1,13 +1,13 @@
 @component('mail::message')
 Hello,
 
-You are receiving this email because you created a account on Castle.
+You are receiving this email because you created an account on Castle.
 
 @component('mail::button', ['url' => $link])
     Verify
 @endcomponent
 
-If you did not request a password reset, no further action is required.
+If you haven't created an account, no further action is required.
 
 Regards,
 Castle<br>

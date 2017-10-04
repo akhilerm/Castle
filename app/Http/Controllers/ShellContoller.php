@@ -284,7 +284,7 @@ class ShellContoller extends Controller
             $full_path = storage_path()."/app/".$settings['WORK_DIR'];
             shell_exec("cp -r ".$full_path."levels/".$question_name." ".$full_path."users/".Auth::id()."/".$question_name);
             //create solution.py file
-            shell_exec("echo \"def main(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
+            shell_exec("echo \"def answer(n):\" > ".$full_path."users/".Auth::id()."/".$question_name."/solution.py");
             //update user table with new level id
             $user = Models\user::find(Auth::id());
             $user->level_id = $question_id;
