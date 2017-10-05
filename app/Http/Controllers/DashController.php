@@ -38,7 +38,7 @@ class DashController extends Controller
 
         $request->file('readme')->storeAs('public/levels/'.$request->input('name'),'readme.txt');
         $request->file('constraints')->storeAs('public/levels/'.$request->input('name'), 'constraints.txt');
-        $request->file('answers')->storeAs('public/answers/', $request->input('name').'txt');
+        $request->file('answers')->storeAs('public/answers/', $request->input('name'));
 
         Session::flash('message', 'Added New question');
         return view('dashboard');
