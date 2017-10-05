@@ -91,6 +91,10 @@ class ShellContoller extends Controller
 
         } else {
 
+            if (strpos($args[0], '/')){
+                return response()->json( ['STS'=> false, 'MSG' => 'You Can Only Traverse Through One Directory At A Time(use .. for previous directory). '] );
+            }
+
             //ADDRESS TO  Users home directory
             $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
 
