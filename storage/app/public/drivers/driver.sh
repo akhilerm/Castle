@@ -26,7 +26,7 @@ case $lang in
         echo "FAIL"
     elif [[ $result == *"Traceback"* ]]; then
         echo "ERROR"
-    elif [[ ${#result} -ge 10 ]]; then
+    elif [[ ${#result} -gt 10 ]]; then
         echo "ERROR"
     else
         echo $result
