@@ -44,7 +44,7 @@
             </div>
 
             <div class="">
-                <label for="time" class="">Sub level</label>
+                <label for="time" class="">Duration</label>
                 <input id="time" type="number" class="" name="time" required>
                 @if ($errors->has('time'))
                     <span class="">
