@@ -26,10 +26,10 @@ case $lang in
         echo "FAIL"
     elif [[ $result == *"Traceback"* ]]; then
         echo "ERROR"
-    elif [[ $result == "1111111111" ]]; then
-        echo $result
-    else
+    elif [[ ${#result} -ge 10 ]]; then
         echo "ERROR"
+    else
+        echo $result
     fi
     #removing the copied files and output files
     rm solution.py
