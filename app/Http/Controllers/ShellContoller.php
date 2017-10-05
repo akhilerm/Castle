@@ -354,9 +354,10 @@ class ShellContoller extends Controller
             }
 
             if ($per == 100)
-                $msg = $msg.'\]';
-            $msg = $msg.'\]';
-            $msg = "$msg\n";
+                $msg = $msg."\]\n";
+            else
+                $msg = $msg."]\n";
+            //$msg = "$msg\n";
         }
 
         //for not completed levels
