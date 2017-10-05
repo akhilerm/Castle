@@ -9,8 +9,7 @@ You are receiving this email because you created an account on Castle.
 
 If you haven't created an account, no further action is required.
 
-Regards,
-Castle<br>
+Regards,<br>Castle
 
 If you’re having trouble clicking the Verify button, copy and paste the URL below
 into your web browser: [{{ $link }}]({{ $link }})
