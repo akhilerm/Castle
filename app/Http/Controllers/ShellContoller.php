@@ -103,7 +103,7 @@ class ShellContoller extends Controller
             if (Session::get('pwd') === '~') {
 
                 $user_dir = "$user_dir/$args[0]";
-                if (is_dir(storage_path().'/app/'.$user_dir)) {
+                if (is_dir(storage_path().'/app/'.$user_dir) && !strpos($args[0], '/')) {
 
                     Session::put('pwd', $args[0]);
                     $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
