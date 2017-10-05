@@ -91,10 +91,6 @@ class ShellContoller extends Controller
 
         } else {
 
-            if (strpos($args[0], '/')){
-                return response()->json( ['STS'=> false, 'MSG' => 'You Can Only Traverse Through One Directory At A Time(use .. for previous directory). '] );
-            }
-
             //ADDRESS TO  Users home directory
             $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
 
@@ -102,7 +98,7 @@ class ShellContoller extends Controller
             if (Session::get('pwd') === '~') {
 
                 $user_dir = "$user_dir/$args[0]";
-                if (is_dir(storage_path().'/app/'.$user_dir)) {
+                if (is_dir(storage_path().'/app/'.$user_dir) && !strpos($args[0], '/')) {
 
                     Session::put('pwd', $args[0]);
                     $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
