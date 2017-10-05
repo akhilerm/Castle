@@ -1,2 +1,5 @@
 *
 !.gitignore
+users/
+answers/
+levels/
