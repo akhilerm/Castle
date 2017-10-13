@@ -555,7 +555,7 @@ class ShellContoller extends Controller
         $sts = false;
         $file = false;
 
-        if ( $args[0] !== false && !isset($args[1])) {
+        if ( $args[0] !== false && !isset($args[1]) && !strpos($args[0], '../')) {
 
             if (strpos($args[0], 'solution') !== false) {
 
