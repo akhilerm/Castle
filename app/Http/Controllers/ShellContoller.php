@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Models;
-use Psy\Util\Str;
 use Request;
 
 class ShellContoller extends Controller
@@ -79,11 +78,14 @@ class ShellContoller extends Controller
      */
     public function pwd($command, $path)
     {
+        error_log("Inside pwd");
         $level = Session::get('level');
+        error_log("get session var ".$path);
         $arr = explode('/', $path);
+        error_log("exploded");
         $len = sizeof($arr);
-
-        for ($i = 0; $i<len; $i++) {
+        error_log("starting loop");
+        for ($i = 0; $i<$len; $i++) {
             if ($arr[$i] === '..') {
                 $level--;
                 if ($level < 0) {
@@ -93,7 +95,7 @@ class ShellContoller extends Controller
                 $level++;
             }
         }
-
+        error_log("swithcing");
         switch ($command) {
             case 'cd' : 
                 Session::put('level', $level );
@@ -119,43 +121,52 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
+        error_log("ARGS: ".$args[0]);
+        if ($this->pwd('cd', $args[0])) {
+            error_log("pwd check pased");
+            if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
 
-            //move to home directory
-            Session::put('pwd', '~');
-            $msg = Auth::user()['name'] . '@Castle:'. session('pwd') . '$ ';
-            $sts = true;
+                //move to home directory
+                Session::put('pwd', '~');
+                $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+                $sts = true;
 
-        } elseif ($args[0] === '.') {
+            } elseif ($args[0] === '.') {
 
-            //Keeping it in the same directory
-            $msg = Auth::user()['name'] . '@Castle:~$ ';
+                //Keeping it in the same directory
+                $msg = Auth::user()['name'] . '@Castle:~$ ';
 
-            //constructing the prompt depending on directory
-            if (Session::get('pwd') !== '~')
-                $msg = $msg . "/" . session('pwd') . '$ ';
-            $sts = true;
-
-        } else {
-
-            //ADDRESS TO  Users home directory
-            $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id();
-
-            //Check if the folder exists if in home
-            if (Session::get('pwd') === '~') {
-
-                $user_dir = "$user_dir/$args[0]";
-                if (is_dir(storage_path().'/app/'.$user_dir) && !strpos($args[0], '/')) {
-
-                    Session::put('pwd', $args[0]);
+                //constructing the prompt depending on directory
+                if (Session::get('pwd') !== '~')
                     $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                    $sts = true;
-                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
+                $sts = true;
 
+            } else {
+
+                //ADDRESS TO  Users home directory
+                $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
+
+                //Check if the folder exists if in home
+                if (Session::get('pwd') === '~') {
+
+                    $user_dir = "$user_dir/$args[0]";
+                    if (is_dir(storage_path() . '/app/' . $user_dir) && !strpos($args[0], '/')) {
+
+                        Session::put('pwd', $args[0]);
+                        $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                        $sts = true;
+                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+
+                    }
                 }
-            }
 
-            //No Directory by that name
+                //No Directory by that name
+                $msg = "cd: $args[0]: No such directory";
+                $sts = false;
+            }
+        }
+        else {
+            //No Directory by that name in the hierarchy
             $msg = "cd: $args[0]: No such directory";
             $sts = false;
         }
