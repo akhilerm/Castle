@@ -28,8 +28,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if(!Session::has('pwd')){
-            Session::put('pwd','~');
+        if (!Session::has('pwd')) {
+            Session::put('pwd', '~');
+            Session::put('level', 0);
         }
         $user = user::find(Auth::id());
         $level = level::find($user['level_id']);

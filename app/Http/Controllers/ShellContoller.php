@@ -20,6 +20,10 @@ class ShellContoller extends Controller
         $this->middleware('auth');
     }
 
+    /** 
+     *use the arguments to find appropriate function to execute.
+     @param void
+    */
     public function shell()
     {
         if (Request::ajax()) {
@@ -51,7 +55,7 @@ class ShellContoller extends Controller
 
                 }
 
-                return call_user_func_array( array($this, $req['method']),[$req['args'], $settings]);
+                return call_user_func_array(array($this, $req['method']),[$req['args'], $settings]);
 
             }
 
@@ -65,7 +69,45 @@ class ShellContoller extends Controller
 
         }
     }
+    /**
+     * Used for checking if the user leaves his directory 
+     * when using command cd or edit
+     *
+     * @param [type] $command
+     * @param [type] $path
+     * @return bool
+     */
+    public function pwd($command, $path)
+    {
+        $level = Session::get('level');
+        $arr = explode('/', $path);
+        $len = sizeof($arr);
 
+        for ($i = 0; $i<len; $i++) {
+            if ($arr[$i] === '..') {
+                $level--;
+                if ($level < 0) {
+                    return false;
+                }
+            } else {
+                $level++;
+            }
+        }
+
+        switch ($command) {
+            case 'cd' : 
+                Session::put('level', $level );
+                break;
+             case 'edit' :
+                $level = $level - 1;
+                break;
+            default:
+                return false;
+                break;
+             }
+        
+        return true;
+    }
 
     /**
      * CHANGE DIR: if arg is .. switch to home else switch to folder if exists
