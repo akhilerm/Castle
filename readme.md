@@ -59,7 +59,7 @@ Contributions are invited to support more programming languages and also documen
         │   └── solution.py
         └── readme.txt
 ```
-### TO run the application
+### To run the application
 
 fork/clone this application
 
@@ -69,7 +69,15 @@ You need to build the docker image so that containers can be started using this 
 
 Rename `.env.sample` to `.env`. Change the following in `.env` file - DB name, username, password, mail_id to use, app key etc
 
-Now execute the following commands
+Now you need to create the tables using database migration. The database should be already created manually for the migration to work. In the terminal execute 
+
+`php artisan migrate`
+
+A default level needs to be added in the `levels` table. Execute the following SQL query in phpmyadmin
+
+`INSERT into levels(name,level,sub_level,time) values ('',0,0,3600)`
+
+Now execute the following commands in the terminal 
 
 `php artisan config:clear`
 
