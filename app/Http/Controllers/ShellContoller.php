@@ -78,24 +78,21 @@ class ShellContoller extends Controller
      */
     public function pwd($command, $path)
     {
-        error_log("Inside pwd");
         $level = Session::get('level');
-        error_log("get session var ".$path);
         $arr = explode('/', $path);
-        error_log("exploded");
         $len = sizeof($arr);
-        error_log("starting loop");
         for ($i = 0; $i<$len; $i++) {
             if ($arr[$i] === '..') {
                 $level--;
                 if ($level < 0) {
                     return false;
                 }
+            } elseif ($arr[$i] === '.') {
+
             } else {
                 $level++;
             }
         }
-        error_log("swithcing");
         switch ($command) {
             case 'cd' : 
                 Session::put('level', $level );
@@ -121,7 +118,6 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        error_log("ARGS: ".$args[0]);
         if ($this->pwd('cd', $args[0])) {
             error_log("pwd check pased");
             if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
@@ -137,27 +133,33 @@ class ShellContoller extends Controller
                 $msg = Auth::user()['name'] . '@Castle:~$ ';
 
                 //constructing the prompt depending on directory
-                if (Session::get('pwd') !== '~')
+                if (Session::get('pwd') !== '~') {
                     $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                }
                 $sts = true;
 
             } else {
 
-                //ADDRESS TO  Users home directory
+                /**
+                 * Edit here
+                 * 
+                 */
+
+                //ADDRESS TO  Users directory
                 $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
 
                 //Check if the folder exists if in home
-                if (Session::get('pwd') === '~') {
 
-                    $user_dir = "$user_dir/$args[0]";
-                    if (is_dir(storage_path() . '/app/' . $user_dir) && !strpos($args[0], '/')) {
+                $user_dir = "$user_dir/$args[0]";
+                $full_path = storage_path() . '/app/' . $user_dir;
 
-                        Session::put('pwd', $args[0]);
-                        $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                        $sts = true;
-                        return response()->json(['STS' => $sts, 'MSG' => $msg]);
+                if (is_dir($full_path)) {
+                    
+                    Session::put('pwd', $args[0]);
+                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                    $sts = true;
+                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
 
-                    }
                 }
 
                 //No Directory by that name
