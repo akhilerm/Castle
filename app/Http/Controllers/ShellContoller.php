@@ -19,57 +19,39 @@ class ShellContoller extends Controller
         $this->middleware('auth');
     }
 
-    /** 
+    /**
      *use the arguments to find appropriate function to execute.
      @param void
     */
     public function shell()
     {
         if (Request::ajax()) {
-
             $req = Request::all();
 
             $settings = ['CMD_COLOR' =>  '#FFA500', 'DIR_COLOR' => '#0000FF', 'WORK_DIR' => 'public/'];
 
             //whether anything was typed in the terminal
             if (!isset($req['method'])) {
-
                 $msg = '';
-
-            }
-
-            //method exists or not
+            } //method exists or not
             elseif (!method_exists($this, $req['method'])) {
-
                 $msg = $req['method'].": command not found\nType [[;".$settings['CMD_COLOR'].";]help] for a list of available commands";
-
-            }
-
-            //validate the no. of parameters passes to  the method
+            } //validate the no. of parameters passes to  the method
             elseif ($this->check($req)) {
-
                 if (!isset($req['args'])) {
-
                     $req['args'] = [false];
-
                 }
 
-                return call_user_func_array(array($this, $req['method']),[$req['args'], $settings]);
-
-            }
-
-            else {
-
+                return call_user_func_array(array($this, $req['method']), [$req['args'], $settings]);
+            } else {
                 $msg = $req['method'].": Invalid no. of parameters";
-
             }
 
             return response()->json(['STS' => false, 'MSG' => $msg]);
-
         }
     }
     /**
-     * Used for checking if the user leaves his directory 
+     * Used for checking if the user leaves his directory
      * when using command cd or edit
      *
      * @param [type] $command
@@ -87,23 +69,22 @@ class ShellContoller extends Controller
                 if ($level < 0) {
                     return false;
                 }
-            } elseif ($arr[$i] === '.') {
-
+            } elseif ($arr[$i] === '.' || $arr[$i] === '') {
             } else {
                 $level++;
             }
         }
         switch ($command) {
-            case 'cd' : 
+            case 'cd':
                 Session::put('level', $level );
                 break;
-             case 'edit' :
+            case 'edit':
                 $level = $level - 1;
                 break;
             default:
                 return false;
                 break;
-             }
+        }
         
         return true;
     }
@@ -118,63 +99,46 @@ class ShellContoller extends Controller
 
     public function cd($args, $settings)
     {
-        if ($this->pwd('cd', $args[0])) {
-            error_log("pwd check pased");
-            if ($args[0] === false || $args[0] === '..' || $args[0] === '~') {
-
-                //move to home directory
-                Session::put('pwd', '~');
-                $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
-                $sts = true;
-
-            } elseif ($args[0] === '.') {
-
-                //Keeping it in the same directory
-                $msg = Auth::user()['name'] . '@Castle:~$ ';
-
-                //constructing the prompt depending on directory
-                if (Session::get('pwd') !== '~') {
-                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                }
-                $sts = true;
-
-            } else {
-
-                /**
-                 * Edit here
-                 * 
-                 */
-
-                //ADDRESS TO  Users directory
-                $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
-
-                //Check if the folder exists if in home
-
-                $user_dir = "$user_dir/$args[0]";
-                $full_path = storage_path() . '/app/' . $user_dir;
-
-                if (is_dir($full_path)) {
-                    
-                    Session::put('pwd', $args[0]);
-                    $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
-                    $sts = true;
-                    return response()->json(['STS' => $sts, 'MSG' => $msg]);
-
-                }
-
-                //No Directory by that name
-                $msg = "cd: $args[0]: No such directory";
-                $sts = false;
+        if ($args[0] === false || $args[0] === '~') {
+            //move to home directory
+            Session::put('pwd', '~');
+            $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
+            $sts = true;
+        } elseif ($args[0] === '.') {
+            //Keeping it in the same directory
+            $msg = Auth::user()['name'] . '@Castle:~$ ';
+            //constructing the prompt depending on directory
+            if (Session::get('pwd') !== '~') {
+                $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
             }
-        }
-        else {
-            //No Directory by that name in the hierarchy
+            $sts = true;
+        } else {
+            //remove / from end and begining of the argument dir
+            $args[0] = trim($args[0], '/');
+
+            //ADDRESS TO  Users directory
+            $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
+            $cd_dir = '';            
+            if (Session::get('pwd') !== '~') {
+                $cd_dir = Session::get('pwd') ."/$args[0]";
+            } else {
+                $cd_dir = $args[0];
+            }
+            $full_path = storage_path() . "/app/$user_dir/$cd_dir";
+
+            if (is_dir($full_path) && $this->pwd('cd', $args[0])) {
+                Session::put('pwd', $cd_dir);
+                $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
+                $sts = true;
+                return response()->json(['STS' => $sts, 'MSG' => $msg]);
+            }
+            
+            //No Directory by that name
             $msg = "cd: $args[0]: No such directory";
             $sts = false;
         }
 
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
-
     }
 
     /**
@@ -190,32 +154,24 @@ class ShellContoller extends Controller
         $user_dir = $user_dir = $settings['WORK_DIR'] .'users/'. Auth::id() . '/';
 
         if (Session::get('pwd') !== '~') {
-
             $user_dir = $user_dir . Session::get('pwd') . '/';
-
         }
 
         $user_dir = "$user_dir$args[0]";
 
         //Check IF file exist and get content
         if (Storage::has($user_dir)) {
-
             //Check if file is directory
-            if(!is_dir(storage_path().'/app/'.$user_dir)) {
+            if (!is_dir(storage_path().'/app/'.$user_dir)) {
                 $msg = Storage::get($user_dir);
-            } else{
+            } else {
                 $msg = "cat: $args[0] is not a file.";
             }
-
-
         } else {
-
             $msg = "cat: $args[0]: No such file";
-
         }
 
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
-
     }
 
     /**
@@ -230,7 +186,6 @@ class ShellContoller extends Controller
 
         $msg = "\nUse the following shell commands: \n[[;" . $settings['CMD_COLOR']. ";]cd]     - change directory [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]cat]    - print file [file_name] \n[[;" . $settings['CMD_COLOR']. ";]clear]  - clear the terminal \n[[;" . $settings['CMD_COLOR']. ";]edit]   - open file in editor [file_name] \n[[;" . $settings['CMD_COLOR']. ";]help]   - display this message \n[[;" . $settings['CMD_COLOR']. ";]ls]     - list directory contents [dir_name] \n[[;" . $settings['CMD_COLOR']. ";]logout] - logout from Castle \n[[;" . $settings['CMD_COLOR']. ";]request]- request a new challenge \n[[;" . $settings['CMD_COLOR']. ";]status] - print progress \n[[;" . $settings['CMD_COLOR']. ";]submit] - submit final solution for assessment [file_name] \n[[;" . $settings['CMD_COLOR']. ";]verify] - runs tests on solution file [file_name]\n\nEditor commands\n[[;" . $settings['CMD_COLOR']. ";]Ctrl+S] - save file\n[[;" . $settings['CMD_COLOR']. ";]Ctrl+E] - exit editor";
         return response()->json([ 'STS' => true, 'MSG' => $msg]);
-
     }
 
     /**
@@ -240,54 +195,45 @@ class ShellContoller extends Controller
      * @param $settings
      * @return \Illuminate\Http\JsonResponse
      */
-    public function ls($args,$settings)
+    public function ls($args, $settings)
     {
 
         //calculating present directory
         $user_dir = $settings['WORK_DIR'].'users/'.Auth::id().'/';
 
-        if (Session::get('pwd') !== '~' ) {
-
+        if (Session::get('pwd') !== '~') {
             $user_dir = $user_dir.Session::get('pwd').'/';
-
         }
 
         //modify the path on which ls should operate depending on whether a dir has been passed as arg.
-        if ($args[0] !== false){
-
+        if ($args[0] !== false) {
             $user_dir = "$user_dir$args[0]";
-
         }
 
         $msg ='';
-        if (is_dir(storage_path().'/app/'.$user_dir) ) {
-
+        if (is_dir(storage_path().'/app/'.$user_dir)) {
             $files = Storage::files($user_dir);
             $dirs = Storage::directories($user_dir);
 
             //add color to directory
-            if (sizeof($dirs) > 0)
+            if (sizeof($dirs) > 0) {
                 $dirs[0] = "[[;".$settings['DIR_COLOR'].";]$dirs[0]]";
+            }
 
             $all_files = array_merge($files, $dirs);
 
             //Fixing Format
             $count = 0;
             foreach ($all_files as $file) {
-
-                if ($count !== 0){
+                if ($count !== 0) {
                     $msg  = "$msg\n";
                 }
                 $file = strtr($file, [$user_dir => '']);
                 $msg = "$msg$file";
                 $count++;
-
             }
-
         } else {
-
             $msg = "ls: $args[0]: No such directory";
-
         }
 
         return response()->json([ 'MSG' => $msg , 'STS'=> true]);
@@ -306,30 +252,21 @@ class ShellContoller extends Controller
 
         //check if any directories are already present
         if (sizeof($list) > 0) {
-
             $sts = false;
             $msg = "You can request a new challenge only after completing the current challenge. \n";
-
         } else {
-
             $user_level = $this->getLevelData();
 
             //Check the current status of user and increment it unless game is over
             if ($user_level['status'] === 'COMPLETED') {
                 if ($user_level['level'] == $user_level['max_level'] && $user_level['sublevel'] == $user_level['max_sublevel']) {
-
                     $msg = 'No more challenges. You did it.';
                     return response()->json(['STS' => false, 'MSG' => $msg]);
-
                 } elseif ($user_level['sublevel'] == $user_level['max_sublevel']) {
-
                     $user_level['sublevel'] = 1;
                     $user_level['level']++;
-
                 } else {
-
                     $user_level['sublevel']++;
-
                 }
             }
 
@@ -354,7 +291,6 @@ class ShellContoller extends Controller
             error_log("TIMR CALCULATED".$time);
             $sts = true;
             $msg = 'New challenge added.';
-
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg, 'TIME' => $time]);
@@ -388,30 +324,33 @@ class ShellContoller extends Controller
 
         //for current level
         if ($user_level['level'] != 0) {
-
-            if ($user_level['status'] != 'COMPLETED')
+            if ($user_level['status'] != 'COMPLETED') {
                 $user_level['sublevel']--;
+            }
 
             $per = round($user_level['sublevel'] * 100 / $user_level['max_sublevel']);
 
             //to apply color if 100%
-            if ($per == 100)
+            if ($per == 100) {
                 $msg = $msg.'[[;#00e575;]';
+            }
 
             $msg = $msg.'Level '.$user_level['level'].' '.str_pad("$per%", 5, ' ', STR_PAD_RIGHT);
 
             $msg = $msg.'[';
             for ($i = 1; $i <= 20; $i++) {
-                if ($i <= $per/5)
+                if ($i <= $per/5) {
                     $msg = $msg.'=';
-                else
+                } else {
                     $msg = $msg.'.';
+                }
             }
 
-            if ($per == 100)
+            if ($per == 100) {
                 $msg = $msg."\]\n";
-            else
+            } else {
                 $msg = $msg."]\n";
+            }
             //$msg = "$msg\n";
         }
 
@@ -437,7 +376,6 @@ class ShellContoller extends Controller
 
         //check if verification was successful
         if ($output['STS'] == true) {
-
             $sts = true;
             $msg = 'Solution submitted successfully';
             $full_path = storage_path().'/app/'.$settings['WORK_DIR'];
@@ -451,13 +389,9 @@ class ShellContoller extends Controller
             $user->status = 'COMPLETED';
             $user->save();
             //add code for removing countdown
-
-        }
-        else {
-
+        } else {
             $sts = false;
             $msg = 'Solution can be submitted only after successful verification';
-
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
@@ -480,7 +414,6 @@ class ShellContoller extends Controller
         $user_dir = "$user_dir$args[0]";
         if (Storage::has($user_dir)) {
             if (strpos($args[0], 'solution') !== false) {
-
                 $level_id = Models\user::find(Auth::id())->level_id;
                 $question_name = Models\level::find($level_id)->name;
                 $full_path = storage_path() . "/app/" . $settings['WORK_DIR'];
@@ -490,19 +423,13 @@ class ShellContoller extends Controller
                 $output_array = explode("\n", $output);
                 //check the result of execution, if execution has failed or not
                 if ($output_array[0] == 'FAIL') {
-
                     $msg = "[[;#FF0000;]$output_array[1]]";
-
                 } else {
-
                     //successfull execution, no. of test cases satisfied
                     if ($output_array[1] == '1111111111') {
-
                         $msg = "All test cases passed";
                         $sts = true;
-
                     } else {
-
                         $msg = "\n";
 
                         //customizing color for each test case depending on pass/fail
@@ -516,16 +443,12 @@ class ShellContoller extends Controller
                     }
                 }
             } else {
-
                 $sts = false;
                 $msg = "./$args[0]: Permission denied";
-
             }
         } else {
-
             $sts = false;
             $msg = "verify: $args[0]: No such file";
-            
         }
 
         return response()->json(['STS' => $sts, 'MSG' => $msg]);
@@ -564,20 +487,23 @@ class ShellContoller extends Controller
             case 'logout':
             case 'request':
             case 'status':
-                if (!isset($req['args']))
+                if (!isset($req['args'])) {
                     return true;
+                }
                 break;
             case 'ls':
             case 'cd':
-                if (!isset($req['args']) || sizeof($req['args']) <= 1)
+                if (!isset($req['args']) || sizeof($req['args']) <= 1) {
                     return true;
+                }
                 break;
             case 'cat':
             case 'verify':
             case 'submit':
             case 'edit':
-                if (isset($req['args']) && sizeof($req['args']) == 1)
+                if (isset($req['args']) && sizeof($req['args']) == 1) {
                     return true;
+                }
                 break;
         }
         return false;
@@ -593,28 +519,24 @@ class ShellContoller extends Controller
     public function logout($args, $settings)
     {
         if ($args[0] === false) {
-
             Auth::logout();
             Session::flush();
             return response()->json(['MSG' => 'logged out', 'STS' => true]);
-
         }
 
         return response()->json(['MSG' => 'invalid argument', 'STS' => false]);
     }
 
 
-    public function  edit($args, $settings)
+    public function edit($args, $settings)
     {
         $msg = 'No Such File';
         $sts = false;
         $file = false;
 
 
-        if ( $args[0] !== false && !isset($args[1]) && $this->pwd('edit', $args[0])) {
-
+        if ($args[0] !== false && !isset($args[1]) && $this->pwd('edit', $args[0])) {
             if (strpos($args[0], 'solution') !== false) {
-
                 //calculating present directory
                 $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id() . '/';
                 if (Session::get('pwd') !== '~') {
@@ -623,24 +545,18 @@ class ShellContoller extends Controller
 
                 $user_dir = "$user_dir$args[0]";
                 if (Storage::has($user_dir)) {
-
                     $msg = Storage::get($user_dir);
                     $file = $user_dir;
                     $sts = true;
-
                 }
             } else {
-
                 $msg = '[[;#FF0000;]File not editable]';
                 $sts = false;
                 $file = '';
-
             }
             //$msg = $user_dir;
         }
 
         return response()->json(['MSG' => $msg, 'STS' => $sts, 'FILE' => $file]);
-
     }
-
 }
