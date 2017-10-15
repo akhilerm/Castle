@@ -102,6 +102,7 @@ class ShellContoller extends Controller
         if ($args[0] === false || $args[0] === '~') {
             //move to home directory
             Session::put('pwd', '~');
+            Session::put('level', 0);
             $msg = Auth::user()['name'] . '@Castle:' . session('pwd') . '$ ';
             $sts = true;
         } elseif ($args[0] === '.') {
@@ -137,7 +138,6 @@ class ShellContoller extends Controller
             $msg = "cd: $args[0]: No such directory";
             $sts = false;
         }
-
         return response()->json( ['STS'=> $sts, 'MSG' => $msg] );
     }
 
