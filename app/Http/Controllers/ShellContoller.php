@@ -119,8 +119,9 @@ class ShellContoller extends Controller
 
             //ADDRESS TO  Users directory
             $user_dir = $settings['WORK_DIR'] . 'users/' . Auth::id();
-            $cd_dir = '';            
-            if (Session::get('pwd') !== '~') {
+            $cd_dir = '';
+
+            /*if (Session::get('pwd') !== '~') {
                 $cd_dir = Session::get('pwd') ."/$args[0]";
             } else {
                 $cd_dir = $args[0];
@@ -132,7 +133,7 @@ class ShellContoller extends Controller
                 $msg = Auth::user()['name'] . '@Castle:~/' . session('pwd') . '$ ';
                 $sts = true;
                 return response()->json(['STS' => $sts, 'MSG' => $msg]);
-            }
+            }*/
             
             //No Directory by that name
             $msg = "cd: $args[0]: No such directory";
