@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
@@ -26,6 +27,11 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    protected function credentials(Request $request)
+    {
+        return  [$this->username() => $request->input($this->username()), 'password' => $request->input('password'), 'active' => 1];
+    }
 
     /**
      * Create a new controller instance.
